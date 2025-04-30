@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS 관련 파일
+.DS_Store
+Thumbs.db
+
+# 환경변수
+.env
+.env.*.local
+
+# 빌드 아웃풋
+dist/
+build/
+
+# IDE 설정
+.vscode/
+.idea/
+
+# 기타 캐시
+.cache/
+*.tsbuildinfo

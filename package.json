@@ -1,0 +1,25 @@
+{
+  "name": "secondhand-marketplace",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm --prefix api run start:dev\" \"npm --prefix app run dev\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/owtdxv/secondhand-marketplace.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/owtdxv/secondhand-marketplace/issues"
+  },
+  "homepage": "https://github.com/owtdxv/secondhand-marketplace#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
