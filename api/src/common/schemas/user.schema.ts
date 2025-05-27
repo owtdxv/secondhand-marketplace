@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -14,14 +14,14 @@ export class User {
   @Prop({ required: true, unique: true })
   displayName!: string;
 
-  @Prop()
+  @Prop({ default: null })
   profileImage?: string;
 
-  @Prop({ required: true, enum: ["local", "naver"], default: "local" })
-  provider!: "local" | "naver";
+  @Prop({ required: true, enum: ['local', 'naver'], default: 'local' })
+  provider!: 'local' | 'naver';
 
-  @Prop({ required: true, enum: ["ACTIVE", "BANNED"], default: "ACTIVE" })
-  active!: "ACTIVE" | "BANNED";
+  @Prop({ required: true, enum: ['ACTIVE', 'BANNED'], default: 'ACTIVE' })
+  active!: 'ACTIVE' | 'BANNED';
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
