@@ -24,7 +24,6 @@ import { Temp, TempSchema } from '../common/schemas/temp.schema';
       // UserProductList 기반 컬렉션 3개 등록
       { name: 'LikedProducts', schema: UserProductListSchema },
       { name: 'ViewedProducts', schema: UserProductListSchema },
-      { name: 'RecommendedProducts', schema: UserProductListSchema },
       { name: Temp.name, schema: TempSchema },
     ]),
   ],
