@@ -85,4 +85,24 @@ export class AuthService {
   async getProfile(uid: string) {
     return this.userModel.findById(uid).select('-password').exec();
   }
+
+  /**
+   * 이메일 중복 여부를 검사합니다
+   * @param email 이메일 값입니다
+   */
+  async checkEmailDuplicate(email: string): Promise<{ isDuplicate: boolean }> {
+    const existing = await this.userModel.exists({ email });
+    return { isDuplicate: !!existing };
+  }
+
+  /**
+   * 닉네임 중복 여부를 검사합니다
+   * @param displayName 닉네임
+   */
+  async checkNameDuplicate(
+    displayName: string,
+  ): Promise<{ isDuplicate: boolean }> {
+    const existing = await this.userModel.exists({ displayName });
+    return { isDuplicate: !!existing };
+  }
 }

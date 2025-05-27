@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
@@ -27,7 +28,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  getProfile(@Req() req: any): Promise<any> {
+  async getProfile(@Req() req: any): Promise<any> {
     // 이 상황에 any를 사용하는건 사실 적절하진 않지만 지금은 괜찮을거라 생각합니다
     const uid = req.user.uid;
     return this.authService.getProfile(uid);
@@ -38,5 +39,19 @@ export class AuthController {
     @Body() body: { email: string; password: string; displayName: string },
   ) {
     return this.authService.signup(body);
+  }
+
+  @Get('check-email')
+  async checkEmail(
+    @Query('email') email: string,
+  ): Promise<{ isDuplicate: Boolean }> {
+    return this.authService.checkEmailDuplicate(email);
+  }
+
+  @Get('check-name')
+  async checkName(
+    @Query('displayName') displayName: string,
+  ): Promise<{ isDuplicate: Boolean }> {
+    return this.authService.checkNameDuplicate(displayName);
   }
 }
