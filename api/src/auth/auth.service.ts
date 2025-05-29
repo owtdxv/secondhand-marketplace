@@ -105,4 +105,27 @@ export class AuthService {
     const existing = await this.userModel.exists({ displayName });
     return { isDuplicate: !!existing };
   }
+
+  /**
+   * 사용자 닉네임을 수정합니다
+   * @param uid 사용자 uid
+   * @param displayName 변경할 닉네임
+   */
+  async changeDisplayName(
+    uid: String,
+    displayName: string,
+  ): Promise<{ success: Boolean }> {
+    // 닉네임 중복 검사
+    const existing = await this.userModel.exists({ displayName });
+    if (existing) {
+      throw new ConflictException('이미 사용중인 닉네임입니다.');
+    }
+
+    const result = await this.userModel.updateOne(
+      { _id: uid },
+      { $set: { displayName } },
+    );
+
+    return { success: result.modifiedCount > 0 };
+  }
 }
