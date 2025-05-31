@@ -1,0 +1,52 @@
+.wrap {
+  width: 100%;
+  height: 282px;
+  background-color: #61a872;
+
+  color: white;
+  font-size: 14px;
+}
+
+.footerTop {
+  width: 100%;
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.menu {
+  width: 1200px;
+  padding: 0 40px;
+  display: flex;
+  gap: 16px;
+  list-style: none;
+  align-items: center;
+  margin: auto;
+}
+
+.miniLine {
+  width: 1px;
+  height: 12px;
+  background-color: white;
+}
+
+.line {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+}
+
+.footerBottom {
+  width: 100%;
+  height: 226px;
+  display: flex;
+}
+
+.wrapBottom {
+  width: 1200px;
+  padding: 0 40px;
+
+  display: flex;
+  justify-content: space-between;
+  margin: 49px auto 0;
+}
