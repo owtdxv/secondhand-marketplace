@@ -1,3 +1,34 @@
 .wrap {
-  margin: 0;
+  background-color: white;
+  width: 100%;
+  height: 64px;
+}
+
+.mainWrap {
+  max-width: 1200px;
+  padding: 0 40px;
+  margin: auto;
+}
+
+.topAd {
+  width: 1200px;
+  margin-top: 67px;
+}
+
+.wrapAd {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ad {
+  width: 380px;
+  height: 299px;
+  border-radius: 8px;
+  background-color: #d9d9d9;
+}
+
+.middleAd {
+  width: 1200px;
+  height: 136px;
 }

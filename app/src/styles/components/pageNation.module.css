@@ -1,0 +1,26 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 17px;
+  padding: 24px 0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #d6d6d6; /* 비활성 점 색상 */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  border: none;
+  outline: none;
+}
+
+.dot:hover {
+  transform: scale(1.2);
+}
+
+.active {
+  background-color: #638f60; /* 활성 점 색상 */
+}
