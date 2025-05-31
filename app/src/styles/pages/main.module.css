@@ -7,7 +7,7 @@
 .mainWrap {
   max-width: 1200px;
   padding: 0 40px;
-  margin: auto;
+  margin: 0 auto 90px;
 }
 
 .topAd {
@@ -32,6 +32,7 @@
   width: 1200px;
   height: 136px;
   background-color: #d9d9d9;
+  margin-top: 24px;
 }
 
 .productsWrap {
@@ -59,4 +60,22 @@
   color: #929292;
   text-align: center;
   height: 19px;
+  margin-right: 6px;
+}
+
+.wrapProducts {
+  max-width: 1200px;
+  min-width: 750px;
+  margin-top: 39px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.subTitle {
+  font-size: 16px;
+  display: flex;
+  align-items: flex-end; /* 세로 방향 아래로 정렬 */
+  justify-content: flex-start; /* 가로 방향 왼쪽 정렬 */
+  height: 100%;
+  margin-left: 16px;
 }
