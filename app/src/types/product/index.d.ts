@@ -1,3 +1,6 @@
 export interface ProductInfo {
-  id: number;
+  photo: string;
+  title: string;
+  price: string;
+  time: string;
 }

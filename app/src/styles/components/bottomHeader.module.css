@@ -1,0 +1,51 @@
+.wrap {
+  background-color: white;
+  width: 100%;
+  height: 64px;
+}
+
+.header {
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: auto;
+  padding: 0 40px;
+}
+
+.logo {
+  width: 116px;
+  height: 32px;
+}
+
+.search {
+  border: none;
+  width: 615px;
+  height: 40px;
+  border-bottom: 2px solid #61a872;
+}
+
+.search:focus {
+  outline: none;
+}
+
+.menu {
+  display: flex;
+  font-size: 16px;
+  font-weight: 600;
+  list-style: none;
+  justify-content: space-between;
+  gap: 36px;
+
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+.text {
+  height: 19px;
+  margin: 0;
+}
