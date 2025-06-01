@@ -1,4 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ProductsService } from './products.service';
 
-@Controller('products')
-export class ProductsController {}
+@Controller('product')
+export class ProductsController {
+  constructor(private productsService: ProductsService) {}
+
+  @Get()
+  async getAllProducts(@Query('filter') filter: string) {
+    return this.productsService.findAll(filter);
+  }
+}
