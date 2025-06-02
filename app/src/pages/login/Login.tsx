@@ -11,6 +11,7 @@ const Login: React.FC<LoginProps> = ({
   onEmailChange,
   onPasswordChange,
   onLogin,
+  onNaverLogin,
 }) => {
   return (
     <div className={styles.loginPageContainer}>
@@ -67,6 +68,7 @@ const Login: React.FC<LoginProps> = ({
           <span className={styles.separatorMargin}>소셜 로그인</span>
           <span className={styles.separatorLine}></span>
         </div>
+        <button onClick={onNaverLogin}>네이버로그인</button>
       </div>
     </div>
   );
