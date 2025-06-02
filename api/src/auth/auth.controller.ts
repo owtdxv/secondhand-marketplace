@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Put,
   Query,
   Req,
   UnauthorizedException,
@@ -55,5 +56,18 @@ export class AuthController {
     @Query('displayName') displayName: string,
   ): Promise<{ isDuplicate: Boolean }> {
     return this.authService.checkNameDuplicate(displayName);
+  }
+
+  @Put('/edit/displayname')
+  @UseGuards(AuthGuard('jwt'))
+  async changeName(
+    @Req() req: any,
+    @Body() body: { displayName: string },
+  ): Promise<any> {
+    const uid = req.user.uid;
+    const { displayName } = body;
+    const success = (await this.authService.changeDisplayName(uid, displayName))
+      .success;
+    return this.authService.getProfile(uid);
   }
 }
