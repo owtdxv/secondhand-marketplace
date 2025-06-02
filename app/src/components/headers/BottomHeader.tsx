@@ -4,12 +4,20 @@ import Logo from "@/assets/Logo.png";
 import chat from "@/assets/icon/chat.png";
 import myPage from "@/assets/icon/person.png";
 import sale from "@/assets/icon/sale.png";
+import { useNavigate } from "react-router-dom";
 
 const BottomHeader = () => {
+  const navigate = useNavigate();
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
-        <img className={styles.logo} src={Logo} />
+        <img
+          onClick={() => {
+            navigate("/");
+          }}
+          className={styles.logo}
+          src={Logo}
+        />
         <input
           className={styles.search}
           type="text"
@@ -18,7 +26,14 @@ const BottomHeader = () => {
         <ul className={styles.menu}>
           <li className={styles.item}>
             <img width={25} src={sale} />
-            <p className={styles.text}>판매하기</p>
+            <p
+              onClick={() => {
+                navigate("/add-product");
+              }}
+              className={styles.text}
+            >
+              판매하기
+            </p>
           </li>
           <li className={styles.item}>
             <img width={25} src={myPage} />
