@@ -7,6 +7,7 @@ export interface LoginProps {
   onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onLogin: () => void;
+  onNaverLogin: () => void;
 }
 
 export interface SignupProps {

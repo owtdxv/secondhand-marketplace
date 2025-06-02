@@ -19,6 +19,23 @@ const LoginContainer = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const { accessToken } = event.data;
+      if (accessToken) {
+        sessionStorage.setItem("token", accessToken);
+      }
+
+      navigate("/");
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
+
   // 이메일과 비밀번호 입력 시 로그인 버튼 활성화 여부 결정
   useEffect(() => {
     setIsLoginButtonEnabled(email.length > 0 && password.length > 0);
@@ -83,6 +100,31 @@ const LoginContainer = () => {
     }
   };
 
+  const handleNaverLogin = async () => {
+    const clientId = import.meta.env.VITE_NAVER_CLIENT_ID;
+    const redirectUri = encodeURIComponent(
+      import.meta.env.VITE_NAVER_REDIRECT_URI
+    );
+    const state = Math.random().toString(36).substring(2, 15); // CSRF 보호용
+
+    const authUrl =
+      `https://nid.naver.com/oauth2.0/authorize` +
+      `?response_type=code&client_id=${clientId}` +
+      `&redirect_uri=${redirectUri}` +
+      `&state=${state}`;
+
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    window.open(
+      authUrl,
+      "naverLogin",
+      `width=${width},height=${height},left=${left},top=${top},resizable=no,scrollbars=yes`
+    );
+  };
+
   return (
     <Login
       email={email}
@@ -93,6 +135,7 @@ const LoginContainer = () => {
       onEmailChange={handleEmailChange}
       onPasswordChange={handlePasswordChange}
       onLogin={handleLogin}
+      onNaverLogin={handleNaverLogin}
     />
   );
 };
