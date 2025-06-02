@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import styles from "@/styles/pages/signup.module.css";
+import Logo from "@/assets/Logo_full.png";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -9,6 +11,7 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [passwordMatch, setPasswordMatch] = useState(true);
+  const [passwordValid, setPasswordValid] = useState(true);
   const [emailCheckResult, setEmailCheckResult] = useState<null | boolean>(
     null
   );
@@ -16,6 +19,13 @@ const Signup = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
+
+  const isValidPassword = (pw: string) => {
+    // 영문자, 숫자, 특수문자 포함 8~16자
+    const regex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,16}$/;
+    return regex.test(pw);
+  };
 
   const handleConfirmPasswordChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -32,8 +42,7 @@ const Signup = () => {
         `/api/auth/check-email?email=${encodeURIComponent(email)}`
       );
       setEmailCheckResult(response.data.isDuplicate);
-    } catch (error) {
-      console.error("이메일 중복검사 실패", error);
+    } catch {
       setEmailCheckResult(null);
     }
   };
@@ -45,8 +54,7 @@ const Signup = () => {
         `/api/auth/check-name?displayName=${encodeURIComponent(displayName)}`
       );
       setNameCheckResult(response.data.isDuplicate);
-    } catch (error) {
-      console.error("닉네임 중복검사 실패", error);
+    } catch {
       setNameCheckResult(null);
     }
   };
@@ -64,6 +72,13 @@ const Signup = () => {
       return;
     }
 
+    if (!passwordValid) {
+      setErrorMessage(
+        "비밀번호는 영문, 숫자, 특수문자를 포함하여 8~16자여야 합니다."
+      );
+      return;
+    }
+
     if (!passwordMatch) {
       setErrorMessage("비밀번호가 일치하지 않습니다.");
       return;
@@ -77,12 +92,11 @@ const Signup = () => {
       });
 
       if (response.status === 201 || response.status === 200) {
-        navigate("/login");
+        navigate("/signup-complete");
       }
     } catch (error: any) {
       const status = error.response?.status;
       const message = error.response?.data?.message;
-
       if (status === 409) {
         setErrorMessage(message);
       } else {
@@ -92,80 +106,144 @@ const Signup = () => {
   };
 
   return (
-    <div>
-      <div>
-        <label>이메일:</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setEmailCheckResult(null);
-          }}
-        />
-        <button type="button" onClick={checkEmailDuplicate}>
-          중복검사
-        </button>
-        {emailCheckResult === true && (
-          <p style={{ color: "red" }}>이미 사용 중인 이메일입니다.</p>
-        )}
-        {emailCheckResult === false && (
-          <p style={{ color: "green" }}>사용 가능한 이메일입니다.</p>
-        )}
-      </div>
+    <div className={styles.signupPageContainer}>
+      <div className={styles.signupFormWrapper}>
+        <img src={Logo} alt="로고" className={styles.logo} />
 
-      <div>
-        <label>닉네임:</label>
-        <input
-          type="text"
-          value={displayName}
-          onChange={(e) => {
-            setDisplayName(e.target.value);
-            setNameCheckResult(null);
-          }}
-        />
-        <button type="button" onClick={checkNameDuplicate}>
-          중복검사
-        </button>
-        {nameCheckResult === true && (
-          <p style={{ color: "red" }}>이미 사용 중인 닉네임입니다.</p>
-        )}
-        {nameCheckResult === false && (
-          <p style={{ color: "green" }}>사용 가능한 닉네임입니다.</p>
-        )}
-      </div>
+        {/* 이메일 */}
+        <div className={styles.inputGroup}>
+          <label>이메일</label>
+          <div className={styles.inputWithButton}>
+            <input
+              type="email"
+              placeholder="이메일을 입력해주세요."
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setEmailCheckResult(null);
+              }}
+              className={emailCheckResult === true ? styles.inputError : ""}
+            />
+            <button
+              type="button"
+              onClick={checkEmailDuplicate}
+              className={styles.checkButton}
+              disabled={!email}
+            >
+              중복검사
+            </button>
+          </div>
+          <p
+            className={
+              emailCheckResult === true
+                ? styles.errorMessage
+                : styles.successMessage
+            }
+          >
+            {emailCheckResult === true && "이미 사용 중인 이메일입니다."}
+            {emailCheckResult === false && "사용 가능한 이메일입니다."}
+          </p>
+        </div>
 
-      <div>
-        <label>비밀번호:</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            setPasswordMatch(e.target.value === confirmPassword);
-          }}
-        />
-      </div>
+        {/* 닉네임 */}
+        <div className={styles.inputGroup}>
+          <label>닉네임</label>
+          <div className={styles.inputWithButton}>
+            <input
+              type="text"
+              placeholder="닉네임을 입력해주세요."
+              value={displayName}
+              onChange={(e) => {
+                setDisplayName(e.target.value);
+                setNameCheckResult(null);
+              }}
+              className={nameCheckResult === true ? styles.inputError : ""}
+            />
+            <button
+              type="button"
+              onClick={checkNameDuplicate}
+              className={styles.checkButton}
+              disabled={!displayName}
+            >
+              중복검사
+            </button>
+          </div>
+          <p
+            className={
+              nameCheckResult === true
+                ? styles.errorMessage
+                : styles.successMessage
+            }
+          >
+            {nameCheckResult === true && "이미 사용 중인 닉네임입니다."}
+            {nameCheckResult === false && "사용 가능한 닉네임입니다."}
+          </p>
+        </div>
 
-      <div>
-        <label>비밀번호 확인:</label>
-        <input
-          type="password"
-          value={confirmPassword}
-          onChange={handleConfirmPasswordChange}
-        />
-        {!passwordMatch && (
-          <p style={{ color: "red" }}>비밀번호가 일치하지 않습니다.</p>
-        )}
-      </div>
+        {/* 비밀번호 */}
+        <div className={styles.inputGroup}>
+          <label>비밀번호</label>
+          <input
+            type="password"
+            placeholder="비밀번호를 입력해주세요."
+            value={password}
+            onChange={(e) => {
+              const value = e.target.value;
+              setPassword(value);
+              setPasswordMatch(value === confirmPassword);
+              setPasswordValid(isValidPassword(value));
+            }}
+            className={
+              !passwordMatch || !passwordValid ? styles.inputError : ""
+            }
+          />
+          <p className={styles.errorMessage}>
+            {!passwordValid &&
+              "비밀번호는 영문, 숫자, 특수문자를 포함하여 8~16자여야 합니다."}
+          </p>
+        </div>
 
-      <div>
-        <button type="button" onClick={handleSignup}>
+        {/* 비밀번호 확인 */}
+        <div className={styles.inputGroup}>
+          <label>비밀번호 확인</label>
+          <input
+            type="password"
+            placeholder="비밀번호를 한번 더 입력해주세요."
+            value={confirmPassword}
+            onChange={handleConfirmPasswordChange}
+            className={!passwordMatch ? styles.inputError : ""}
+          />
+          <p className={styles.errorMessage}>
+            {!passwordMatch && "비밀번호가 일치하지 않습니다."}
+          </p>
+        </div>
+
+        {/* 에러 메시지 */}
+        <p className={styles.errorMessage}>{errorMessage}</p>
+
+        {/* 가입 버튼 */}
+        <button
+          className={styles.signupButton}
+          type="button"
+          onClick={handleSignup}
+          disabled={
+            !email ||
+            !displayName ||
+            !password ||
+            !confirmPassword ||
+            !passwordMatch ||
+            !passwordValid ||
+            emailCheckResult !== false ||
+            nameCheckResult !== false
+          }
+        >
           회원가입
         </button>
-      </div>
 
-      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+        <a href="/login" className={styles.registerLink}>
+          로그인 하기
+        </a>
+      </div>
     </div>
   );
 };

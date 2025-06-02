@@ -4,6 +4,7 @@ import TopHeader from "./components/headers/TopHeader";
 import BottomHeader from "./components/headers/BottomHeader";
 import LoginContainer from "./pages/login";
 import SignupContainer from "./pages/signup";
+import SignupComplete from "./pages/signup/SignupComplete";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<MainContainer />} />
         <Route path="/login" element={<LoginContainer />} />
         <Route path="/signup" element={<SignupContainer />} />
+        <Route path="/signup-complete" element={<SignupComplete />} />
       </Routes>
     </>
   );
