@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -63,6 +67,14 @@ export class AuthService {
       throw new ConflictException('이미 사용중인 닉네임입니다.');
     }
 
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,16}$/;
+    if (!passwordRegex.test(password)) {
+      throw new BadRequestException(
+        '비밀번호는 영문, 숫자, 특수문자를 포함하여 8~16자여야 합니다.',
+      );
+    }
+
     // 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -104,5 +116,28 @@ export class AuthService {
   ): Promise<{ isDuplicate: boolean }> {
     const existing = await this.userModel.exists({ displayName });
     return { isDuplicate: !!existing };
+  }
+
+  /**
+   * 사용자 닉네임을 수정합니다
+   * @param uid 사용자 uid
+   * @param displayName 변경할 닉네임
+   */
+  async changeDisplayName(
+    uid: String,
+    displayName: string,
+  ): Promise<{ success: Boolean }> {
+    // 닉네임 중복 검사
+    const existing = await this.userModel.exists({ displayName });
+    if (existing) {
+      throw new ConflictException('이미 사용중인 닉네임입니다.');
+    }
+
+    const result = await this.userModel.updateOne(
+      { _id: uid },
+      { $set: { displayName } },
+    );
+
+    return { success: result.modifiedCount > 0 };
   }
 }
