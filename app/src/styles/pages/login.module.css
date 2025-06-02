@@ -11,7 +11,7 @@
   flex-direction: column;
   align-items: center;
   padding: 40px;
-  max-width: 500px;
+  max-width: 450px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -59,9 +59,13 @@
   box-sizing: border-box;
 }
 
+.inputGroup input:focus {
+  outline: none;
+}
+
 .loginButton {
   width: 100%;
-  padding: 12px;
+  padding: 15px;
   background-color: #d9d9d9;
   color: #fff;
   border: none;
@@ -71,7 +75,7 @@
 }
 
 .loginButton:enabled {
-  background-color: #4caf50;
+  background-color: #61a872;
   color: white;
   cursor: pointer;
 }
@@ -82,8 +86,8 @@
   width: 100%; /* 부모 요소의 너비를 가득 채우게 함 */
   text-align: right; /* 내용을 오른쪽으로 정렬 */
   margin-top: 10px;
-  font-size: 0.9em;
-  color: #666;
+  font-size: 0.8em;
+  color: #a4a4a4;
   text-decoration: none;
 }
 
@@ -100,4 +104,9 @@
   flex-grow: 1;
   height: 2px;
   background-color: #ddd;
+  margin: 10px 0;
+}
+
+.separatorMargin {
+  margin: 0px 10px 0px 10px;
 }

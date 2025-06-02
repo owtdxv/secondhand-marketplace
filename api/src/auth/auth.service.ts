@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -61,6 +65,14 @@ export class AuthService {
     const nameExists = await this.userModel.findOne({ displayName });
     if (nameExists) {
       throw new ConflictException('이미 사용중인 닉네임입니다.');
+    }
+
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,16}$/;
+    if (!passwordRegex.test(password)) {
+      throw new BadRequestException(
+        '비밀번호는 영문, 숫자, 특수문자를 포함하여 8~16자여야 합니다.',
+      );
     }
 
     // 비밀번호 해싱

@@ -4,7 +4,7 @@ import TopHeader from "./components/headers/TopHeader";
 import BottomHeader from "./components/headers/BottomHeader";
 import LoginContainer from "./pages/login";
 import SignupContainer from "./pages/signup";
-import SignupComplete from "./pages/signup/SignupComplete";
+import SignupComplete from "./components/auth/SignupComplete";
 
 function App() {
   return (

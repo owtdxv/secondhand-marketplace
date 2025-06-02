@@ -1,8 +1,14 @@
+import axios from "axios";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Login from "./Login";
-import { useEffect } from "react";
+import Login from "./Login"; // UI 컴포넌트 임포트
 
 const LoginContainer = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [isLoginButtonEnabled, setIsLoginButtonEnabled] = useState(false);
   const navigate = useNavigate();
 
   // 이미 로그인 된 경우 접근 차단
@@ -13,7 +19,82 @@ const LoginContainer = () => {
     }
   }, [navigate]);
 
-  return <Login />;
+  // 이메일과 비밀번호 입력 시 로그인 버튼 활성화 여부 결정
+  useEffect(() => {
+    setIsLoginButtonEnabled(email.length > 0 && password.length > 0);
+  }, [email, password]);
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (e.target.value.length > 0 && emailError) {
+      setEmailError("");
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (e.target.value.length > 0 && passwordError) {
+      setPasswordError("");
+    }
+  };
+
+  const handleLogin = async () => {
+    let hasError = false;
+
+    if (!email) {
+      setEmailError("아이디를 입력해주세요.");
+      hasError = true;
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setEmailError("올바른 이메일 형식을 입력하세요.");
+        hasError = true;
+      } else {
+        setEmailError("");
+      }
+    }
+
+    if (!password) {
+      setPasswordError("비밀번호를 입력해주세요.");
+      hasError = true;
+    } else {
+      setPasswordError("");
+    }
+
+    if (hasError) {
+      return;
+    }
+
+    try {
+      const res = await axios.post("/api/auth/login", {
+        email,
+        password,
+      });
+      const { accessToken } = res.data;
+      sessionStorage.setItem("token", accessToken);
+      navigate("/");
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        setEmailError("이메일 또는 비밀번호가 올바르지 않습니다.");
+        setPasswordError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      } else {
+        alert("로그인 실패: " + (error.response?.data?.error || error.message));
+      }
+    }
+  };
+
+  return (
+    <Login
+      email={email}
+      password={password}
+      emailError={emailError}
+      passwordError={passwordError}
+      isLoginButtonEnabled={isLoginButtonEnabled}
+      onEmailChange={handleEmailChange}
+      onPasswordChange={handlePasswordChange}
+      onLogin={handleLogin}
+    />
+  );
 };
 
 export default LoginContainer;

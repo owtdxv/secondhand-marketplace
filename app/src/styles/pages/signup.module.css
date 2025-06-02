@@ -11,7 +11,7 @@
   flex-direction: column;
   align-items: center;
   padding: 40px;
-  max-width: 500px;
+  max-width: 450px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -28,7 +28,6 @@
 
 .inputGroup {
   width: 100%;
-  margin-bottom: 10px;
 }
 
 .inputGroup label {
@@ -47,6 +46,10 @@
   font-size: 14px;
 }
 
+.inputGroup input:focus {
+  outline: none;
+}
+
 .inputGroup .inputWithButton {
   display: flex;
   gap: 8px;
@@ -60,7 +63,6 @@
   flex: 1;
 }
 
-/* 중복검사 버튼 개선 */
 .checkButton {
   padding: 10px 14px;
   background-color: #d9d9d9;
@@ -73,7 +75,7 @@
 }
 
 .checkButton:enabled {
-  background-color: #4caf50;
+  background-color: #61a872;
   cursor: pointer;
 }
 
@@ -89,7 +91,7 @@
 }
 
 .successMessage {
-  color: green;
+  color: #61a872;
 }
 
 /* 빨간 줄 표시용 input */
@@ -100,7 +102,7 @@
 
 .signupButton {
   width: 100%;
-  padding: 12px;
+  padding: 15px;
   background-color: #d9d9d9;
   color: #fff;
   border: none;
@@ -109,7 +111,7 @@
 }
 
 .signupButton:enabled {
-  background-color: #4caf50;
+  background-color: #61a872;
   color: white;
   cursor: pointer;
 }
@@ -119,7 +121,7 @@
   width: 100%;
   text-align: right;
   margin-top: 10px;
-  font-size: 0.9em;
-  color: #666;
+  font-size: 0.8em;
+  color: #a4a4a4;
   text-decoration: none;
 }
