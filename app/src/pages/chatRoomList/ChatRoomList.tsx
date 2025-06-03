@@ -1,7 +1,7 @@
 const ChatRoomList = () => {
   return (
     <div className="">
-      <p>으하하</p>
+      <p>절반은 온것 같다</p>
     </div>
   );
 };
