@@ -1,0 +1,136 @@
+.loginPageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 86px);
+  width: 100%;
+}
+
+.loginFormWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  max-width: 450px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.logo {
+  width: 220px;
+  margin-bottom: 50px;
+}
+
+.errorMessage {
+  min-height: 0.1em;
+  color: #e53935;
+  font-size: 0.85em;
+  margin-top: 5px;
+  visibility: visible;
+}
+
+.errorMessage.hidden {
+  visibility: hidden; /* 화면에는 공간 차지하지만 보이지 않게 */
+}
+
+/* 에러 발생 시 input 필드 테두리 스타일 */
+.inputError {
+  border: none !important;
+  border-bottom: 1px solid #e53935 !important;
+  outline: none;
+}
+
+.inputGroup {
+  width: 100%;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+  color: #333;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 12px 12px 12px 0px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.inputGroup input:focus {
+  outline: none;
+}
+
+.loginButton {
+  width: 100%;
+  padding: 15px;
+  background-color: #d9d9d9;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: not-allowed;
+  margin-top: 10px;
+}
+
+.loginButton:enabled {
+  background-color: #61a872;
+  color: white;
+  cursor: pointer;
+}
+
+.registerLink {
+  /* 클래스 이름 변경 */
+  display: block; /* 링크를 블록 요소로 만들어 너비를 차지하게 함 */
+  width: 100%; /* 부모 요소의 너비를 가득 채우게 함 */
+  text-align: right; /* 내용을 오른쪽으로 정렬 */
+  margin-top: 10px;
+  font-size: 0.8em;
+  color: #a4a4a4;
+  text-decoration: none;
+}
+
+.socialLoginSeparator {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 30px 0;
+  color: #aaa;
+  font-size: 0.9em;
+}
+
+.separatorLine {
+  flex-grow: 1;
+  height: 2px;
+  background-color: #ddd;
+  margin: 10px 0;
+}
+
+.separatorMargin {
+  margin: 0px 10px 0px 10px;
+}
+
+.naverLoginButton {
+  display: flex;
+  align-items: center;
+  padding: 7px 10px 7px 10px;
+  background-color: #03c75a;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+  font-size: 1em;
+  color: white;
+  gap: 6px;
+}
+
+.naverLogo {
+  width: 40px;
+  height: 40px;
+}
+
+.naverText {
+  padding: 12px 12px 12px 0;
+  width: 100%;
+}
