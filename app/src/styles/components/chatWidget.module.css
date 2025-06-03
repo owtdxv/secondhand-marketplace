@@ -9,4 +9,24 @@
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   padding: 10px;
+  overflow: hidden;
+}
+
+.enter {
+  transform: translateY(100%);
+  opacity: 0;
+}
+.enterActive {
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 0.4s ease;
+}
+.exit {
+  transform: translateY(0);
+  opacity: 1;
+}
+.exitActive {
+  transform: translateY(100%);
+  opacity: 0;
+  transition: all 0.4s ease;
 }

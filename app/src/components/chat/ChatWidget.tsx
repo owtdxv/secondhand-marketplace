@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
 import styles from "@/styles/components/chatWidget.module.css";
 import ChatRoomListContainer from "../../pages/chatRoomList";
 import { User } from "../../types/user";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Room = () => {
-  // Room 컴포넌트는 그대로 둡니다
-  // 필요시 props로 사용자 정보 전달 가능
+  const nav = useNavigate();
   return (
-    <>
-      <p>2번 (채팅방)</p>
-    </>
+    <div>
+      <button onClick={() => nav("/")}>화면 전환</button>
+      <p>채팅방</p>
+    </div>
   );
 };
 
@@ -23,22 +24,24 @@ const LoginPrompt = () => (
   </div>
 );
 
-const ChatWidget: React.FC = () => {
+type ChatWidgetProps = {
+  onClose: () => void;
+};
+
+const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     if (!token) {
-      setLoading(false); // 비로그인 상태
+      setLoading(false);
       return;
     }
 
-    // 토큰이 있으면 사용자 정보 요청
     fetch("/api/auth/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error("인증 실패");
@@ -48,38 +51,60 @@ const ChatWidget: React.FC = () => {
         setUser(data);
       })
       .catch(() => {
-        // 인증 실패 시 토큰 제거
         sessionStorage.removeItem("token");
         setUser(null);
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return <div className={styles.chatWidgetContainer}>로딩 중...</div>;
-  }
+  useEffect(() => {
+    if (!loading) {
+      setVisible(true);
+    }
+  }, [loading]);
 
-  if (!user) {
-    // 로그인 안 됐을 때 보여줄 화면
-    return (
-      <div className={styles.chatWidgetContainer}>
-        <LoginPrompt />
-      </div>
-    );
-  }
+  const handleClose = () => {
+    setVisible(false); // exit 애니메이션 실행
+  };
 
   return (
-    <div className={styles.chatWidgetContainer}>
-      <p>사용자 uid = {user?._id}</p>
-      <MemoryRouter>
-        <Routes>
-          <Route path="/" element={<ChatRoomListContainer />} />
-          <Route path="/room/:id" element={<Room />} />
-        </Routes>
-      </MemoryRouter>
-    </div>
+    <AnimatePresence
+      onExitComplete={() => {
+        onClose(); // exit 애니메이션 끝나면 부모에게 알림
+      }}
+    >
+      {visible && (
+        <motion.div
+          className={styles.chatWidgetContainer}
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 100 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+        >
+          <button
+            onClick={handleClose}
+            style={{ position: "absolute", top: 10, right: 10, zIndex: 10 }}
+            aria-label="채팅창 닫기"
+          >
+            ✕
+          </button>
+
+          {loading && <div>로딩 중...</div>}
+          {!loading && !user && <LoginPrompt />}
+          {!loading && user && (
+            <>
+              <p>사용자 uid = {user._id}</p>
+              <MemoryRouter>
+                <Routes>
+                  <Route path="/" element={<ChatRoomListContainer />} />
+                  <Route path="/room/:id" element={<Room />} />
+                </Routes>
+              </MemoryRouter>
+            </>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

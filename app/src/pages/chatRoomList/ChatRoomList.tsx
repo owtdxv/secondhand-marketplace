@@ -1,7 +1,16 @@
-const ChatRoomList = () => {
+import { Socket } from "socket.io-client";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+interface ChatRoomListProps {}
+
+const ChatRoomList: React.FC<ChatRoomListProps> = ({}) => {
+  const navigate = useNavigate();
+
   return (
-    <div className="">
-      <p>절반은 온것 같다</p>
+    <div>
+      <button onClick={() => navigate("/room/:id")}>화면 전환</button>
+      <p>채팅방 리스트 표시</p>
     </div>
   );
 };

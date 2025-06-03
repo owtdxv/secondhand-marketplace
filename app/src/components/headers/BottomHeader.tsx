@@ -17,18 +17,25 @@ const toggleChatUI = () => {
   if (!chatContainer) return;
 
   if (isChatOpen) {
-    // 닫을 때 unmount 후 chatRoot를 null로 초기화
-    chatRoot?.unmount();
-    chatRoot = null;
-    isChatOpen = false;
-  } else {
-    // 열 때 chatRoot가 없으면 새로 생성
-    if (!chatRoot) {
-      chatRoot = createRoot(chatContainer);
-    }
-    chatRoot.render(<ChatWidget />);
-    isChatOpen = true;
+    return;
   }
+
+  // 열 때 chatRoot 없으면 생성
+  if (!chatRoot) {
+    chatRoot = createRoot(chatContainer);
+  }
+
+  chatRoot.render(
+    <ChatWidget
+      onClose={() => {
+        chatRoot?.unmount();
+        chatRoot = null;
+        isChatOpen = false;
+      }}
+    />
+  );
+
+  isChatOpen = true;
 };
 
 const BottomHeader: React.FC = () => {
