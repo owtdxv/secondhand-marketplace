@@ -236,6 +236,28 @@ export class ProductsService {
 
     const isLiked = !!liked;
 
+    // viewedProducts에 추가
+    const viewedDoc = await this.viewedProductsModel.findOne({
+      uid: new Types.ObjectId(uid),
+    });
+
+    if (viewedDoc) {
+      // 이미 본 상품의 경우 해당 값을 제거하고
+      viewedDoc.productIds = viewedDoc.productIds.filter(
+        (id) => id.toString() !== productId,
+      );
+
+      // 배열 맨 앞에 추가
+      viewedDoc.productIds.unshift(product._id as Types.ObjectId);
+
+      await viewedDoc.save();
+    } else {
+      await this.viewedProductsModel.create({
+        uid: new Types.ObjectId(uid),
+        productIds: [product._id],
+      });
+    }
+
     return {
       ...product,
       isMine,
