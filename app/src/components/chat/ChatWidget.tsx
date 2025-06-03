@@ -6,16 +6,8 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
-
-const Home = () => {
-  const navigate = useNavigate();
-  return (
-    <>
-      <p>1번 (홈)</p>
-      <button onClick={() => navigate("/room/123")}>채팅방 123 이동</button>
-    </>
-  );
-};
+import styles from "@/styles/components/chatWidget.module.css";
+import ChatRoomListContainer from "../../pages/chatRoomList";
 
 const Room = () => {
   const navigate = useNavigate();
@@ -30,23 +22,10 @@ const Room = () => {
 
 const ChatWidget: React.FC = () => {
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 20,
-        right: 20,
-        width: 300,
-        height: 400,
-        border: "1px solid #ccc",
-        backgroundColor: "white",
-        zIndex: 1000,
-        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        padding: 10,
-      }}
-    >
+    <div className={styles.chatWidgetContainer}>
       <MemoryRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<ChatRoomListContainer />} />
           <Route path="/room/:id" element={<Room />} />
         </Routes>
       </MemoryRouter>
