@@ -158,6 +158,21 @@ export class ProductsService {
     return userLikedList.productIds;
   }
 
+  //상품 생성시간과 현재시간 비교하는 함수
+  getRelativeTime(date: Date): string {
+    const diffMs = Date.now() - new Date(date).getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHour / 24);
+
+    if (diffSec < 60) return '방금 전';
+    if (diffMin < 60) return `${diffMin}분 전`;
+    if (diffHour < 24) return `${diffHour}시간 전`;
+    if (diffDay < 7) return `${diffDay}일 전`;
+    return new Date(date).toLocaleDateString(); // 'YYYY.MM.DD'
+  }
+
   // 메인에서 전체상품보기로 넘어간경우
   async findAll({
     page,
@@ -181,7 +196,7 @@ export class ProductsService {
     //28개씩 상품들을 나눠서 보여줌
     const skip = (page - 1) * limit;
 
-    const [items, total] = await Promise.all([
+    const [rawItems, total] = await Promise.all([
       this.productModel
         .find()
         .sort(sortOption)
@@ -191,6 +206,11 @@ export class ProductsService {
         .exec(),
       this.productModel.countDocuments(),
     ]);
+
+    const items = rawItems.map((item) => ({
+      ...item,
+      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
+    }));
     return {
       page,
       totalPages: Math.ceil(total / limit),
@@ -262,25 +282,11 @@ export class ProductsService {
       });
     }
 
-    function getRelativeTime(date: Date): string {
-      const diffMs = Date.now() - new Date(date).getTime();
-      const diffSec = Math.floor(diffMs / 1000);
-      const diffMin = Math.floor(diffSec / 60);
-      const diffHour = Math.floor(diffMin / 60);
-      const diffDay = Math.floor(diffHour / 24);
-
-      if (diffSec < 60) return '방금 전';
-      if (diffMin < 60) return `${diffMin}분 전`;
-      if (diffHour < 24) return `${diffHour}시간 전`;
-      if (diffDay < 7) return `${diffDay}일 전`;
-      return new Date(date).toLocaleDateString(); // 'YYYY.MM.DD'
-    }
-
     return {
       ...product,
       isMine,
       isLiked,
-      lastUpdated: getRelativeTime(new Date((product as any).updatedAt)),
+      lastUpdated: this.getRelativeTime(new Date((product as any).updatedAt)),
       seller: {
         displayName: seller?.displayName,
         profileImage: seller?.profileImage,
