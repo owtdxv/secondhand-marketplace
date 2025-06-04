@@ -6,9 +6,25 @@
   box-sizing: border-box;
 }
 
+.profileImgWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.unreadDot {
+  position: absolute;
+  top: 0;
+  right: 14px;
+  width: 14px;
+  height: 14px;
+  background-color: #f15746;
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+
 .profileImg {
-  width: 48px;
-  height: 48px;
+  width: 43px;
+  height: 43px;
   border-radius: 50%;
   background-color: #eee;
   object-fit: cover;
@@ -37,7 +53,7 @@
 }
 
 .timestamp {
-  font-size: 0.6em;
+  font-size: 0.8em;
   color: #a4a4a4;
   white-space: nowrap;
   margin-left: 12px;

@@ -3,6 +3,7 @@ import { ChatRoomInfo, Message } from "../../types/chat";
 import styles from "@/styles/pages/chat.module.css";
 import BackIcon from "@/assets/icon/Arrow_forward.png";
 import AttachIcon from "@/assets/icon/Attach_file.png";
+import DefaultProfile from "@/assets/default_profile.png";
 
 interface ChatProps {
   chatRoomData: ChatRoomInfo;
@@ -95,7 +96,7 @@ const Chat: React.FC<ChatProps> = ({
           className={styles.backIcon}
         />
         <img
-          src={chatRoomData.otherUser.profileImage}
+          src={chatRoomData.otherUser.profileImage || DefaultProfile}
           alt="프로필"
           className={styles.messageProfilePic} // 헤더용 프로필 이미지 스타일 사용
         />
@@ -138,7 +139,8 @@ const Chat: React.FC<ChatProps> = ({
                   <img
                     src={
                       msg.senderId.profileImage ||
-                      chatRoomData.otherUser.profileImage
+                      chatRoomData.otherUser.profileImage ||
+                      DefaultProfile
                     }
                     alt={msg.senderId.displayName}
                     className={styles.messageProfilePic} // 메시지용 프로필 사진 클래스

@@ -1,18 +1,24 @@
 import { ChatRoomInfo } from "../../types/chat";
 import styles from "@/styles/components/chatRoom.module.css";
+import { User } from "../../types/user";
+import DefaultProfile from "@/assets/default_profile.png";
 
 interface PropsType {
+  user: User;
   data: ChatRoomInfo;
 }
 
-const ChatRoom = ({ data }: PropsType) => {
+const ChatRoom = ({ user, data }: PropsType) => {
+  const isUnread = data.lastMessage?.read?.[user._id] === false;
   return (
     <div className={styles.chatRoomContainer}>
-      <img
-        className={styles.profileImg}
-        src={data.otherUser.profileImage || undefined}
-        alt={`${data.otherUser.displayName} 프로필 이미지`}
-      />
+      <div className={styles.profileImgWrapper}>
+        <img
+          className={styles.profileImg}
+          src={data.otherUser.profileImage || DefaultProfile}
+        />
+        {isUnread && <span className={styles.unreadDot} />}
+      </div>
       <div className={styles.chatInfo}>
         <div className={styles.userRow}>
           <div className={styles.userName}>{data.otherUser.displayName}</div>

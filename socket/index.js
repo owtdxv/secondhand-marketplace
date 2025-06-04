@@ -56,18 +56,17 @@ io.on("connection", (socket) => {
     console.log(`${uid} 연결`);
   });
 
+  socket.on("readUpdate", async ({ chatRoomId, uid }) => {
+    await Message.updateMany(
+      { chatRoomId: chatRoomId },
+      { $set: { [`read.${uid}`]: true } }
+    );
+  });
+
   socket.on("sendMessage", async ({ chatRoomId, senderId, message }) => {
     try {
       console.log(`메세지 전송: ${chatRoomId}, ${senderId}, ${message}`);
       if (!chatRoomId || !senderId || !message) return;
-
-      const newMessage = await Message.create({
-        chatRoomId,
-        senderId,
-        message,
-        sentAt: new Date(),
-        read: false,
-      });
 
       await ChatRoom.findByIdAndUpdate(chatRoomId, { updatedAt: new Date() });
 
@@ -75,6 +74,23 @@ io.on("connection", (socket) => {
         "participants",
         "_id"
       );
+
+      const readStatus = {};
+      chatRoomData.participants.forEach((user) => {
+        if (user._id == senderId) {
+          readStatus[user._id.toString()] = true;
+        } else {
+          readStatus[user._id.toString()] = false;
+        }
+      });
+
+      const newMessage = await Message.create({
+        chatRoomId,
+        senderId,
+        message,
+        sentAt: new Date(),
+        read: readStatus,
+      });
 
       io.to(chatRoomId).emit("newMessage", newMessage);
       chatRoomData.participants.forEach((user) => {

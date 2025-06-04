@@ -21,13 +21,10 @@ export class ChatController {
   @UseGuards(AuthGuard('jwt'))
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async createOrGetChatRoom(
-    @Body() body: { participants: string[]; productId: string },
+    @Body() body: { participants: string[] },
     @Req() req: any,
   ) {
-    return this.chatService.createOrGetChatRoom(
-      body.participants,
-      body.productId,
-    );
+    return this.chatService.createOrGetChatRoom(body.participants);
   }
 
   @Get('/rooms/:uid')

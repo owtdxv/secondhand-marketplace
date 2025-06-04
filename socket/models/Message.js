@@ -7,7 +7,7 @@ const messageSchema = new Schema({
   senderId: { type: Types.ObjectId, ref: "User", required: true },
   message: { type: String, required: true },
   sentAt: { type: Date, default: Date.now },
-  read: { type: Boolean, default: false },
+  read: { type: Map, Boolean, default: {} },
 });
 
 module.exports = mongoose.model("Message", messageSchema);

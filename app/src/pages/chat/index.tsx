@@ -71,7 +71,16 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ socket }) => {
       chatRoomId: id,
     });
 
+    socket.emit("readUpdate", {
+      chatRoomId: id,
+      uid: user._id,
+    });
+
     const handleNewMessage = (newMessage: Message) => {
+      socket.emit("readUpdate", {
+        chatRoomId: id,
+        uid: user._id,
+      });
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     };
 

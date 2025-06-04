@@ -5,11 +5,6 @@ export interface ChatRoomInfo {
     displayName: string;
     profileImage: string;
   };
-  productId: {
-    _id: string;
-    name: string;
-    sellerId: string;
-  };
   createdAt: string;
   updatedAt: string;
   lastMessage: {
@@ -18,7 +13,7 @@ export interface ChatRoomInfo {
     senderId: string;
     message: string;
     sentAt: string;
-    read: boolean;
+    read: { [userId: string]: boolean }; // Map 타입 반영
     __v?: number;
   } | null;
 }
@@ -33,6 +28,6 @@ export interface Message {
   };
   message: string;
   sentAt: string;
-  read: boolean;
+  read: { [userId: string]: boolean }; // Map 타입 반영
   __v?: number;
 }

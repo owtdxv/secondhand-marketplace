@@ -16,9 +16,6 @@ export class ChatRoom {
   })
   participants!: Types.ObjectId[];
 
-  @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
-  productId!: Types.ObjectId;
-
   @Prop()
   createdAt!: Date;
 
@@ -27,4 +24,3 @@ export class ChatRoom {
 }
 
 export const ChatRoomSchema = SchemaFactory.createForClass(ChatRoom);
-ChatRoomSchema.index({ productId: 1, participants: 1 }, { unique: true });

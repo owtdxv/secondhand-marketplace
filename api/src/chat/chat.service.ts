@@ -28,26 +28,21 @@ export class ChatService {
    *
    * @returns 채팅방 ID
    */
-  async createOrGetChatRoom(participants: string[], productId: string) {
+  async createOrGetChatRoom(participants: string[]) {
     if (!Array.isArray(participants) || participants.length !== 2) {
       throw new BadRequestException('participants는 정확히 2명이어야 합니다.');
-    }
-    if (!productId) {
-      throw new BadRequestException('productId가 필요합니다.');
     }
 
     const objectIds = participants.map((id) => new Types.ObjectId(id));
     objectIds.sort(); // 오름차순 정렬
 
     let chatRoom = await this.chatRoomModel.findOne({
-      productId,
       participants: objectIds,
     });
 
     if (!chatRoom) {
       chatRoom = await this.chatRoomModel.create({
         participants: objectIds,
-        productId,
       });
     }
 
@@ -63,7 +58,6 @@ export class ChatService {
     const chatRooms = await this.chatRoomModel
       .find({ participants: userId })
       .populate('participants', 'displayName profileImage')
-      .populate('productId', 'name sellerId')
       .sort({ updatedAt: -1 })
       .lean<ChatRoomDocument[]>();
 
@@ -82,7 +76,6 @@ export class ChatService {
         return {
           _id: room._id,
           otherUser,
-          productId: room.productId,
           createdAt: room.createdAt,
           updatedAt: room.updatedAt,
           lastMessage: lastMessage || null,

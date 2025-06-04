@@ -49,7 +49,7 @@ const ChatRoomListContainer: React.FC<ChatRoomListContainerProps> = ({
     return () => {};
   }, [user, socket]);
 
-  return <ChatRoomList chatRooms={chatRooms} />;
+  return <ChatRoomList user={user} chatRooms={chatRooms} />;
 };
 
 export default ChatRoomListContainer;

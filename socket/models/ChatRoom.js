@@ -13,11 +13,8 @@ const chatRoomSchema = new Schema(
         message: "participants는 정확히 2명의 사용자 ID 배열이어야 합니다.",
       },
     },
-    productId: { type: Types.ObjectId, ref: "Product", required: true },
   },
   { timestamps: true }
 );
-
-chatRoomSchema.index({ productId: 1, participants: 1 }, { unique: true });
 
 module.exports = mongoose.model("ChatRoom", chatRoomSchema);
