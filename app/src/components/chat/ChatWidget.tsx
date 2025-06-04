@@ -4,6 +4,8 @@ import styles from "@/styles/components/chatWidget.module.css";
 import ChatRoomListContainer from "../../pages/chatRoomList";
 import { User } from "../../types/user";
 import { motion, AnimatePresence } from "framer-motion";
+import ChatContainer from "../../pages/chat";
+import X from "@/assets/icon/X.png";
 
 const Room = () => {
   const nav = useNavigate();
@@ -81,23 +83,30 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
           exit={{ opacity: 0, y: 100 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
         >
-          <button
-            onClick={handleClose}
-            style={{ position: "absolute", top: 10, right: 10, zIndex: 10 }}
-            aria-label="채팅창 닫기"
-          >
-            ✕
-          </button>
-
           {loading && <div>로딩 중...</div>}
           {!loading && !user && <LoginPrompt />}
           {!loading && user && (
             <>
-              <p>사용자 uid = {user._id}</p>
               <MemoryRouter>
                 <Routes>
-                  <Route path="/" element={<ChatRoomListContainer />} />
-                  <Route path="/room/:id" element={<Room />} />
+                  <Route
+                    path="/"
+                    element={
+                      <>
+                        <div className={styles.chatBox}>
+                          <span className={styles.title}>채팅</span>
+                          <img
+                            src={X}
+                            alt="닫기"
+                            className={styles.closeIcon}
+                            onClick={handleClose}
+                          />
+                        </div>
+                        <ChatRoomListContainer user={user} />
+                      </>
+                    }
+                  />
+                  <Route path="/room/:id" element={<ChatContainer />} />
                 </Routes>
               </MemoryRouter>
             </>

@@ -1,16 +1,29 @@
-import { Socket } from "socket.io-client";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChatRoomInfo } from "../../types/chat";
+import ChatRoom from "../../components/chat/ChatRoom";
+import styles from "@/styles/pages/chatRoomList.module.css";
 
-interface ChatRoomListProps {}
+interface ChatRoomListProps {
+  chatRooms: ChatRoomInfo[];
+}
 
-const ChatRoomList: React.FC<ChatRoomListProps> = ({}) => {
+const ChatRoomList: React.FC<ChatRoomListProps> = ({ chatRooms }) => {
   const navigate = useNavigate();
-
   return (
     <div>
-      <button onClick={() => navigate("/room/:id")}>화면 전환</button>
-      <p>채팅방 리스트 표시</p>
+      <div></div>
+      {chatRooms.map((room) => (
+        <div
+          key={room._id}
+          onClick={() =>
+            navigate(`/room/${room._id}`, { state: { chatRoomData: room } })
+          }
+          style={{ cursor: "pointer" }}
+        >
+          <ChatRoom data={room} />
+        </div>
+      ))}
     </div>
   );
 };

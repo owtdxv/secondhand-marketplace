@@ -10,6 +10,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   padding: 10px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .enter {
@@ -29,4 +30,29 @@
   transform: translateY(100%);
   opacity: 0;
   transition: all 0.4s ease;
+}
+
+.chatBox {
+  box-sizing: border-box;
+  position: relative;
+  text-align: center;
+  width: 100%;
+  padding: 15px;
+}
+
+.title {
+  margin-left: 20px;
+  font-weight: bold;
+  font-size: 18px;
+  color: #000;
+}
+
+.closeIcon {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
 }

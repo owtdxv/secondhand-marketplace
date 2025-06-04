@@ -67,8 +67,6 @@ export class ChatService {
       .sort({ updatedAt: -1 })
       .lean<ChatRoomDocument[]>();
 
-    console.log(chatRooms);
-
     const chatRoomsWithLastMessage = await Promise.all(
       chatRooms.map(async (room) => {
         // 로그인 사용자가 아닌 상대방만 필터링
@@ -102,7 +100,7 @@ export class ChatService {
    */
   async getMessagesByRoomId(roomId: string) {
     const messages = await this.messageModel
-      .find({ chatRoomId: roomId })
+      .find({ chatRoomId: new Types.ObjectId(roomId) })
       .populate('senderId', 'displayName profileImage')
       .sort({ sentAt: 1 });
 

@@ -30,7 +30,7 @@ export class ChatController {
     );
   }
 
-  @Get('rooms/:uid')
+  @Get('/rooms/:uid')
   @UseGuards(AuthGuard('jwt'))
   async getChatRooms(@Param('uid') uid: string, @Req() req: any) {
     if (req.user.uid != uid) {
@@ -41,7 +41,7 @@ export class ChatController {
     return this.chatService.getChatRoomsByUserId(uid);
   }
 
-  @Get('message/:roomid')
+  @Get('/message/:roomid')
   async getMessages(@Param('roomid') roomId: string) {
     return this.chatService.getMessagesByRoomId(roomId);
   }

@@ -1,0 +1,53 @@
+.chatRoomContainer {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.profileImg {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #eee;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.chatInfo {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.userRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+.userName {
+  font-weight: 600;
+  font-size: 1.1em;
+  color: #121212;
+}
+
+.timestamp {
+  font-size: 0.6em;
+  color: #a4a4a4;
+  white-space: nowrap;
+  margin-left: 12px;
+}
+
+.lastMessage {
+  font-size: 0.9em;
+  color: #a4a4a4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
