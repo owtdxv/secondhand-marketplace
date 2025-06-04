@@ -1,3 +1,7 @@
+.link {
+  text-decoration: none;
+  color: inherit;
+}
 .wrap {
   width: 100%;
   display: flex;

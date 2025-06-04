@@ -11,7 +11,7 @@ const Product = ({ data }: PropsType) => {
         <img src={data.images[0]} className={styles.image} />
       </div>
       <div className={styles.title}>{data.name}</div>
-      <div className={styles.price}>{data.price}원</div>
+      <div className={styles.price}>{data.price.toLocaleString()}원</div>
       <div className={styles.time}>{data.lastUpdated}</div>
     </div>
   );
