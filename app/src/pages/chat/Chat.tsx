@@ -118,13 +118,16 @@ const Chat: React.FC<ChatProps> = ({
 
             // item.type === 'message'
             const msg = item.content as Message;
-            const isOtherUserMessage =
-              msg.senderId._id === chatRoomData.otherUser._id;
+            const senderId =
+              typeof msg.senderId === "string"
+                ? msg.senderId
+                : msg.senderId._id;
+            const isOtherUserMessage = senderId === chatRoomData.otherUser._id;
             const formattedTime = formatTime(msg.sentAt);
 
             return (
               <div
-                key={item.id} // msg._id 대신 item.id 사용 (고유 ID)
+                key={msg._id}
                 className={`${styles.messageRow} ${
                   isOtherUserMessage
                     ? styles.otherUserRow

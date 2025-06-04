@@ -51,6 +51,11 @@ io.on("connection", (socket) => {
     console.log(`${socket.id} joined room ${chatRoomId}`);
   });
 
+  socket.on("joinUser", async ({ uid }) => {
+    socket.join(uid);
+    console.log(`${uid} 연결`);
+  });
+
   socket.on("sendMessage", async ({ chatRoomId, senderId, message }) => {
     try {
       console.log(`메세지 전송: ${chatRoomId}, ${senderId}, ${message}`);
@@ -66,7 +71,16 @@ io.on("connection", (socket) => {
 
       await ChatRoom.findByIdAndUpdate(chatRoomId, { updatedAt: new Date() });
 
+      const chatRoomData = await ChatRoom.findById(chatRoomId).populate(
+        "participants",
+        "_id"
+      );
+
       io.to(chatRoomId).emit("newMessage", newMessage);
+      chatRoomData.participants.forEach((user) => {
+        const userId = user._id.toString();
+        io.to(userId).emit("msgListUpdate");
+      });
     } catch (error) {
       console.error(error);
     }

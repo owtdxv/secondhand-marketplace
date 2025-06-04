@@ -7,10 +7,12 @@ import { Socket } from "socket.io-client";
 
 interface ChatRoomListContainerProps {
   user: User;
+  socket: Socket | null;
 }
 
 const ChatRoomListContainer: React.FC<ChatRoomListContainerProps> = ({
   user,
+  socket,
 }) => {
   const [chatRooms, setChatRooms] = useState<ChatRoomInfo[]>([]);
 
@@ -35,7 +37,17 @@ const ChatRoomListContainer: React.FC<ChatRoomListContainerProps> = ({
     };
 
     fetchChatRooms();
-  }, [user]);
+
+    if (socket && socket.connected && user && user._id) {
+      socket.emit("joinUser", { uid: user._id });
+
+      socket.on("msgListUpdate", () => {
+        fetchChatRooms();
+      });
+    }
+
+    return () => {};
+  }, [user, socket]);
 
   return <ChatRoomList chatRooms={chatRooms} />;
 };

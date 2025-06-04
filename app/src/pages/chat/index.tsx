@@ -1,12 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Chat from "./Chat";
 import axios from "axios";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { User } from "../../types/user";
 import { ChatRoomInfo, Message } from "../../types/chat";
-import { p } from "framer-motion/client";
+import { Socket } from "socket.io-client";
 
-const ChatContainer = () => {
+interface ChatContainerProps {
+  socket: Socket | null;
+}
+
+const ChatContainer: React.FC<ChatContainerProps> = ({ socket }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isComposing, setIsComposing] = useState(false);
   const [input, setInput] = useState<string>("");
@@ -60,6 +64,24 @@ const ChatContainer = () => {
     fetchGetUserInfo();
   }, [id]);
 
+  useEffect(() => {
+    if (!socket || !user || !user._id) return;
+
+    socket.emit("joinRoom", {
+      chatRoomId: id,
+    });
+
+    const handleNewMessage = (newMessage: Message) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    };
+
+    socket.on("newMessage", handleNewMessage);
+
+    return () => {
+      socket.off("newMessage", handleNewMessage);
+    };
+  }, [socket, user?._id]);
+
   const handleBack = () => {
     navigate("/");
   };
@@ -93,19 +115,13 @@ const ChatContainer = () => {
       return;
     }
 
-    const newMessage: Message = {
-      _id: Date.now().toString(),
-      chatRoomId: id,
-      senderId: {
-        _id: user._id,
-        displayName: user.displayName,
-        profileImage: user.profileImage,
-      },
-      message: input.trim(),
-      sentAt: new Date().toISOString(),
-      read: false,
-    };
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    if (socket && socket.connected && user && user._id) {
+      socket.emit("sendMessage", {
+        chatRoomId: id,
+        senderId: user._id,
+        message: input.trim(),
+      });
+    }
     setInput("");
   };
 

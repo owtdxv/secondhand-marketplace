@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
 import styles from "@/styles/components/chatWidget.module.css";
 import ChatRoomListContainer from "../../pages/chatRoomList";
@@ -6,16 +6,7 @@ import { User } from "../../types/user";
 import { motion, AnimatePresence } from "framer-motion";
 import ChatContainer from "../../pages/chat";
 import X from "@/assets/icon/X.png";
-
-const Room = () => {
-  const nav = useNavigate();
-  return (
-    <div>
-      <button onClick={() => nav("/")}>화면 전환</button>
-      <p>채팅방</p>
-    </div>
-  );
-};
+import { io, Socket } from "socket.io-client";
 
 const LoginPrompt = () => (
   <div style={{ padding: 20, textAlign: "center" }}>
@@ -34,6 +25,8 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
+  const socketRef = useRef<Socket | null>(null);
+  const [socketConnected, setSocketConnected] = useState(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -69,6 +62,37 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
     setVisible(false); // exit 애니메이션 실행
   };
 
+  useEffect(() => {
+    if (user && !socketRef.current) {
+      socketRef.current = io("http://localhost:8000", {
+        auth: {
+          token: sessionStorage.getItem("token"),
+        },
+      });
+
+      socketRef.current.on("connect", () => {
+        console.log("Socket connected: ", socketRef.current?.id);
+        setSocketConnected(true);
+      });
+
+      socketRef.current.on("disconnect", () => {
+        console.log("Socket disconnected");
+      });
+    } else {
+      socketRef.current?.disconnect();
+      socketRef.current = null;
+      setSocketConnected(false);
+    }
+
+    return () => {
+      if (socketRef.current && socketRef.current.connected) {
+        console.log("Disconnecting socket on unmount or user change");
+        socketRef.current.disconnect();
+        setSocketConnected(false);
+      }
+    };
+  }, [user]);
+
   return (
     <AnimatePresence
       onExitComplete={() => {
@@ -85,7 +109,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
         >
           {loading && <div>로딩 중...</div>}
           {!loading && !user && <LoginPrompt />}
-          {!loading && user && (
+          {!loading && user && socketConnected && socketRef.current && (
             <>
               <MemoryRouter>
                 <Routes>
@@ -102,11 +126,17 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
                             onClick={handleClose}
                           />
                         </div>
-                        <ChatRoomListContainer user={user} />
+                        <ChatRoomListContainer
+                          user={user}
+                          socket={socketRef.current}
+                        />
                       </>
                     }
                   />
-                  <Route path="/room/:id" element={<ChatContainer />} />
+                  <Route
+                    path="/room/:id"
+                    element={<ChatContainer socket={socketRef.current} />}
+                  />
                 </Routes>
               </MemoryRouter>
             </>

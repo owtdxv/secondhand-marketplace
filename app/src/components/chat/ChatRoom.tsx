@@ -25,7 +25,7 @@ const ChatRoom = ({ data }: PropsType) => {
           </div>
         </div>
         <div className={styles.lastMessage}>
-          {data.lastMessage.message ?? "..."}
+          {data.lastMessage?.message ?? ""}
         </div>
       </div>
     </div>

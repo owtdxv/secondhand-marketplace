@@ -20,7 +20,7 @@ export interface ChatRoomInfo {
     sentAt: string;
     read: boolean;
     __v?: number;
-  };
+  } | null;
 }
 
 export interface Message {
