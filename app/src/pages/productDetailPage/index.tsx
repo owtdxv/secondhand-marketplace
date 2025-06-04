@@ -3,11 +3,40 @@ import ProductDetailPage from "./productDetailPage";
 import { ProductDetailInfo } from "../../types/product";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const ProductDetailPageContainer = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState<ProductDetailInfo>();
   const [currentImageNum, setCurrentImageNum] = useState(1);
+
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
+
+  const navigate = useNavigate();
+
+  const toggleStatusMenu = () => {
+    setShowStatusMenu((prev) => !prev);
+  };
+
+  const onChangeStatus = async (newStatus: "판매중" | "판매완료") => {
+    if (!productId || !product) return;
+    const token = sessionStorage.getItem("token");
+
+    try {
+      await axios.put(
+        `/api/product/update-status/${productId}`,
+        { status: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setProduct({ ...product, status: newStatus });
+      setShowStatusMenu(false);
+    } catch (err) {
+      console.error("상태 변경 실패", err);
+    }
+  };
 
   useEffect(() => {
     if (!productId) return;
@@ -58,6 +87,21 @@ const ProductDetailPageContainer = () => {
     }
   };
 
+  const onClickDelete = async () => {
+    if (!product || !productId) return;
+    const token = sessionStorage.getItem("token");
+    try {
+      await axios.delete(`/api/product/${productId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert("상품이 삭제되었습니다.");
+      navigate("/products"); // 삭제 후 상품 목록 페이지로 이동
+    } catch (err) {
+      console.error("상품 삭제 요청 실패", err);
+      alert("상품 삭제에 실패했습니다.");
+    }
+  };
+
   return (
     <ProductDetailPage
       product={product}
@@ -65,6 +109,10 @@ const ProductDetailPageContainer = () => {
       totalImageNum={product.images.length}
       onImageChange={onImageChange}
       onLikeToggle={onLikeToggle}
+      showStatusMenu={showStatusMenu}
+      toggleStatusMenu={toggleStatusMenu}
+      onChangeStatus={onChangeStatus}
+      onClickDelete={onClickDelete}
     />
   );
 };

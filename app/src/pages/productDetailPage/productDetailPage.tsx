@@ -16,6 +16,10 @@ interface PropsType {
   totalImageNum: number;
   onImageChange: (imageNum: number) => void;
   onLikeToggle: () => void;
+  showStatusMenu: boolean;
+  toggleStatusMenu: () => void;
+  onChangeStatus: (newStatus: "판매중" | "판매완료") => void;
+  onClickDelete: () => void;
 }
 const ProductDetailPage = ({
   product,
@@ -23,6 +27,10 @@ const ProductDetailPage = ({
   totalImageNum,
   onImageChange,
   onLikeToggle,
+  showStatusMenu,
+  toggleStatusMenu,
+  onChangeStatus,
+  onClickDelete,
 }: PropsType) => {
   return (
     <div className={styles.wrap}>
@@ -72,9 +80,51 @@ const ProductDetailPage = ({
                 </span>
               </div>
               {product.status === "판매중" ? (
-                <div className={styles.active_ing}>판매중</div>
+                <div
+                  className={styles.active_ing}
+                  onClick={product.isMine ? toggleStatusMenu : undefined}
+                >
+                  판매중
+                  {showStatusMenu && (
+                    <div className={styles.statusDropdown}>
+                      <div
+                        className={styles.active_ing}
+                        onClick={() => onChangeStatus("판매중")}
+                      >
+                        판매중
+                      </div>
+                      <div
+                        onClick={() => onChangeStatus("판매완료")}
+                        className={styles.active_end}
+                      >
+                        판매완료
+                      </div>
+                    </div>
+                  )}
+                </div>
               ) : (
-                <div className={styles.active_end}>판매 완료</div>
+                <div
+                  className={styles.active_end}
+                  onClick={product.isMine ? toggleStatusMenu : undefined}
+                >
+                  판매 완료
+                  {showStatusMenu && (
+                    <div className={styles.statusDropdown}>
+                      <div
+                        onClick={() => onChangeStatus("판매중")}
+                        className={styles.active_ing}
+                      >
+                        판매중
+                      </div>
+                      <div
+                        onClick={() => onChangeStatus("판매완료")}
+                        className={styles.active_end}
+                      >
+                        판매완료
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
             <div className={styles.underline}></div>
@@ -141,7 +191,9 @@ const ProductDetailPage = ({
               {product.isMine ? (
                 <div className={styles.buttonDiv}>
                   <div className={styles.updateButton}>수정하기</div>
-                  <div className={styles.deleteButton}>삭제하기</div>
+                  <div className={styles.deleteButton} onClick={onClickDelete}>
+                    삭제하기
+                  </div>
                 </div>
               ) : (
                 <div className={styles.chatButton}>채팅하기</div>
