@@ -93,9 +93,18 @@ io.on("connection", (socket) => {
       });
 
       io.to(chatRoomId).emit("newMessage", newMessage);
-      chatRoomData.participants.forEach((user) => {
+      chatRoomData.participants.forEach(async (user) => {
         const userId = user._id.toString();
         io.to(userId).emit("msgListUpdate");
+
+        if (userId != senderId) {
+          const sendData = await Message.findById(newMessage.id).populate(
+            "senderId",
+            "_id displayName profileImage"
+          );
+
+          io.to(userId).emit("notification", sendData);
+        }
       });
     } catch (error) {
       console.error(error);

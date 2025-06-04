@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ChatContainer from "../../pages/chat";
 import X from "@/assets/icon/X.png";
 import { io, Socket } from "socket.io-client";
+import axios from "axios";
 
 const LoginPrompt = () => (
   <div style={{ padding: 20, textAlign: "center" }}>
@@ -35,15 +36,12 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
       return;
     }
 
-    fetch("/api/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("인증 실패");
-        return res.json();
+    axios
+      .get("/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
       })
-      .then((data) => {
-        setUser(data);
+      .then((response) => {
+        setUser(response.data);
       })
       .catch(() => {
         sessionStorage.removeItem("token");
@@ -71,7 +69,6 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
       });
 
       socketRef.current.on("connect", () => {
-        console.log("Socket connected: ", socketRef.current?.id);
         setSocketConnected(true);
       });
 

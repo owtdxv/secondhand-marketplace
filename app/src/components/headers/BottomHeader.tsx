@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot, Root } from "react-dom/client";
 
 import styles from "@/styles/components/bottomHeader.module.css";
@@ -7,7 +7,8 @@ import chat from "@/assets/icon/chat.png";
 import myPage from "@/assets/icon/person.png";
 import sale from "@/assets/icon/sale.png";
 
-import ChatWidget from "@/components/chat/ChatWidget";
+// Update the import path if the file exists elsewhere, for example:
+import ChatWidget from "../chat/ChatWidget";
 
 let chatRoot: Root | null = null;
 let isChatOpen = false;
@@ -31,10 +32,12 @@ const toggleChatUI = () => {
         chatRoot?.unmount();
         chatRoot = null;
         isChatOpen = false;
+        window.dispatchEvent(new Event("chatWidgetClose"));
       }}
     />
   );
 
+  window.dispatchEvent(new Event("chatWidgetOpen"));
   isChatOpen = true;
 };
 
