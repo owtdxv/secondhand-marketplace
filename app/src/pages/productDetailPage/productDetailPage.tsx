@@ -8,30 +8,58 @@ import favoriteBorder from "@/assets/icon/FavoriteBorder.png";
 import favoriteBorderGreen from "@/assets/icon/FavoriteBorderGreen.png";
 import location from "@/assets/icon/Location on.png";
 import PageNation from "../../components/pageNation/PageNation";
+import { ProductDetailInfo } from "../../types/product";
 
-const ProductDetailPage = () => {
+interface PropsType {
+  product: ProductDetailInfo;
+  currentImageNum: number;
+  totalImageNum: number;
+  onImageChange: (imageNum: number) => void;
+  onLikeToggle: () => void;
+}
+const ProductDetailPage = ({
+  product,
+  currentImageNum,
+  totalImageNum,
+  onImageChange,
+  onLikeToggle,
+}: PropsType) => {
   return (
     <div className={styles.wrap}>
       <div className={styles.content}>
         <div className={styles.detailWrap}>
           <div className={styles.productImg}>
-            <img src={arrowLeft} alt="뒤로가기" className={styles.leftArrow} />
+            <img
+              src={arrowLeft}
+              alt="뒤로가기"
+              className={styles.leftArrow}
+              onClick={() => {
+                if (currentImageNum > 1) {
+                  onImageChange(currentImageNum - 1);
+                }
+              }}
+            />
 
             <img
               className={styles.image}
-              src="https://image.msscdn.net/thumbnails/images/goods_img/20250203/4752071/4752071_17388115773926_big.jpg?w=1200"
+              src={product.images[currentImageNum - 1]}
             />
             <img
               src={arrowRight}
               alt="뒤로가기"
               className={styles.rightArrow}
+              onClick={() => {
+                if (currentImageNum < totalImageNum) {
+                  onImageChange(currentImageNum + 1);
+                }
+              }}
             />
           </div>
           <div className={styles.aboutProduct}>
-            <span className={styles.title}>제품명제품명제품명</span>
+            <span className={styles.title}>{product.name}</span>
             <div className={styles.price}>
               <div className={styles.priceNumber}>
-                30,000
+                {product.price.toLocaleString()}
                 <span
                   style={{
                     marginLeft: "5px",
@@ -43,7 +71,11 @@ const ProductDetailPage = () => {
                   원
                 </span>
               </div>
-              <div className={styles.active}>판매중</div>
+              {product.status === "판매중" ? (
+                <div className={styles.active_ing}>판매중</div>
+              ) : (
+                <div className={styles.active_end}>판매 완료</div>
+              )}
             </div>
             <div className={styles.underline}></div>
             <div className={styles.status}>
@@ -55,7 +87,7 @@ const ProductDetailPage = () => {
                   height={25}
                   style={{ marginRight: "6px" }}
                 />
-                125
+                {product.likes}
               </span>
               <span className={styles.separator}></span>
               <span className={styles.statusContent}>
@@ -66,7 +98,7 @@ const ProductDetailPage = () => {
                   height={25}
                   style={{ marginRight: "6px" }}
                 />
-                25
+                {product.views}
               </span>
               <span className={styles.separator}></span>
               <span className={styles.statusContent}>
@@ -77,7 +109,7 @@ const ProductDetailPage = () => {
                   height={25}
                   style={{ marginRight: "6px" }}
                 />
-                10시간 전
+                {product.lastUpdated}
               </span>
             </div>
             <ul className={styles.ul}>
@@ -90,27 +122,39 @@ const ProductDetailPage = () => {
                   height={18}
                   style={{ marginRight: "5px" }}
                 />
-                구로구
+                {product.saleRegion}
               </li>
               <li>
                 <span style={{ marginRight: "81px" }}>카테고리</span>
-                전자기기
+                {product.category}
               </li>
             </ul>
             <div className={styles.favoriteAndButton}>
               <img
-                src={favoriteBorder}
+                src={product.isLiked ? favoriteBorderGreen : favoriteBorder}
                 alt="조회수"
                 width={39}
                 height={39}
                 style={{ marginRight: "25px" }}
+                onClick={onLikeToggle}
               />
-              <div className={styles.chatButton}>채팅하기</div>
+              {product.isMine ? (
+                <div className={styles.buttonDiv}>
+                  <div className={styles.updateButton}>수정하기</div>
+                  <div className={styles.deleteButton}>삭제하기</div>
+                </div>
+              ) : (
+                <div className={styles.chatButton}>채팅하기</div>
+              )}
             </div>
           </div>
         </div>
         <div className={styles.pagination}>
-          <PageNation totalPages={2} currentPage={1} onPageChange={() => {}} />
+          <PageNation
+            totalPages={totalImageNum}
+            currentPage={currentImageNum}
+            onPageChange={onImageChange}
+          />
         </div>
         <div className={styles.descriptionWrap}>
           <div className={styles.description}>
@@ -121,13 +165,7 @@ const ProductDetailPage = () => {
               className={styles.underline}
               style={{ marginBottom: "34px" }}
             />
-            <span>
-              개봉하지 않은 새 상품입니다.개봉하지 않은 새 상품입니다. 개봉하지
-              않은 새 상품입니다. 개봉하지 않은 새 상품입니다. 개봉하지 않은 새
-              상품입니다.
-              <br /> <br /> 개봉하지 않은 새 상품입니다. 개봉하지 않은 새
-              상품입니다. 개봉하지 않은 새 상품입니다.
-            </span>
+            <span>{product.description}</span>
           </div>
           <div className={styles.sellerInfo}>
             <div className={styles.title} style={{ marginBottom: "24px" }}>
@@ -135,10 +173,16 @@ const ProductDetailPage = () => {
             </div>
             <div className={styles.sellerInfoDetail}>
               <div className={styles.sellerNickname}>
-                <div className={styles.nickname}>내가 이 구역의 판매왕</div>
+                <div className={styles.nickname}>
+                  {product.seller.displayName}
+                </div>
                 <div className={styles.profile}>
                   <img
-                    src="https://image.msscdn.net/thumbnails/images/goods_img/20250203/4752071/4752071_17388115773926_big.jpg?w=1200"
+                    src={
+                      product.seller.profileImage
+                        ? product.seller.profileImage
+                        : "https://image.msscdn.net/thumbnails/images/prd_img/20250203/4752071/detail_4752071_17388115837024_big.jpg?w=1200"
+                    }
                     alt="프로필"
                   />
                 </div>
@@ -148,7 +192,9 @@ const ProductDetailPage = () => {
                   <span style={{ fontSize: "16px", color: "#B9B9B9" }}>
                     전체
                   </span>
-                  <span>15</span>
+                  <span>
+                    {product.seller.onSaleCount + product.seller.soldOutCount}
+                  </span>
                 </div>
                 <span className={styles.separator} style={{ height: "20px" }} />
 
@@ -156,7 +202,7 @@ const ProductDetailPage = () => {
                   <span style={{ fontSize: "16px", color: "#B9B9B9" }}>
                     판매중
                   </span>
-                  <span>3</span>
+                  <span>{product.seller.onSaleCount}</span>
                 </div>
                 <span className={styles.separator} style={{ height: "20px" }} />
 
@@ -164,7 +210,7 @@ const ProductDetailPage = () => {
                   <span style={{ fontSize: "16px", color: "#B9B9B9" }}>
                     판매완료
                   </span>
-                  <span>12</span>
+                  <span>{product.seller.soldOutCount}</span>
                 </div>
               </div>
             </div>
