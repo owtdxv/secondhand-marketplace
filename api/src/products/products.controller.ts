@@ -1,5 +1,7 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   Param,
   Put,
@@ -36,5 +38,25 @@ export class ProductsController {
   @UseGuards(AuthGuard('jwt'))
   async toggleLike(@Param('id') productId: string, @Req() req: any) {
     return this.productsService.toggleLike(productId, req.user.uid);
+  }
+
+  @Put('update-status/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async updateStatus(
+    @Param('id') productId: string,
+    @Body('status') status: '판매중' | '판매완료',
+    @Req() req,
+  ) {
+    return this.productsService.updateProductStatus(
+      productId,
+      status,
+      req.user.uid,
+    );
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
+  async delete(@Param('id') productId: string, @Req() req) {
+    return this.productsService.deleteProduct(productId, req.user.uid);
   }
 }

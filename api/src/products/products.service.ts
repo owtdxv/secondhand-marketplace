@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -346,5 +350,46 @@ export class ProductsService {
         likes: product.likes,
       };
     }
+  }
+
+  // 판매상태 변경 (uid가 sellerId와 동일한지 체크후 상태 변경)
+  async updateProductStatus(
+    productId: string,
+    status: '판매중' | '판매완료',
+    uid: string,
+  ) {
+    const product = await this.productModel.findById(productId);
+    if (!product) {
+      throw new NotFoundException('상품을 찾을 수 없습니다.');
+    }
+
+    if (product.sellerId.toString() !== uid) {
+      throw new ForbiddenException('수정 권한이 없습니다.');
+    }
+
+    product.status = status;
+    await product.save();
+
+    return {
+      result: true,
+      message: '상품 상태가 변경되었습니다.',
+      status: status,
+    };
+  }
+
+  // 판매상품 삭제(uid와 sellerId가 동일한 경우만 삭제 가능)
+  async deleteProduct(productId: string, uid: string) {
+    const product = await this.productModel.findById(productId);
+    if (!product) {
+      throw new NotFoundException('상품을 찾을 수 없습니다.');
+    }
+
+    if (product.sellerId.toString() !== uid) {
+      throw new ForbiddenException('삭제 권한이 없습니다.');
+    }
+
+    await product.deleteOne();
+
+    return { result: true, message: '상품이 삭제되었습니다.' };
   }
 }
