@@ -1,0 +1,97 @@
+.wrap {
+  width: 100%;
+}
+
+.addProduct {
+  max-width: 850px;
+  padding: 0 40px;
+  margin: 0 auto 90px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.photos {
+  width: 100%;
+  margin-top: 91px;
+  margin-bottom: 48px;
+}
+
+.photo {
+  width: 102px;
+  height: 102px;
+
+  background-color: #ebebeb;
+  border-radius: 8px;
+}
+
+.wrapSelect {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+
+  margin-top: 35px;
+  margin-bottom: 35px;
+}
+
+.select {
+  width: 410px;
+  height: 54px;
+  border: none;
+  border-bottom: 1px solid #929292;
+  font-size: 16px;
+}
+
+.select:focus {
+  outline: none;
+}
+
+select:invalid {
+  color: #929292;
+}
+
+.textarea {
+  width: 810px;
+  height: 158px;
+  padding: 20px;
+  border: 1px solid #929292;
+  border-radius: 8px;
+  resize: none;
+
+  margin-top: 35px;
+}
+
+.textarea::placeholder {
+  color: #929292;
+}
+
+.textarea:focus {
+  outline: none;
+}
+
+.submitBtn {
+  width: 400px;
+  height: 52px;
+  background-color: #61a872;
+  border: none;
+  font-weight: 600;
+  font-size: 16px;
+  color: white;
+
+  border-radius: 8px;
+  margin-top: 92px;
+}
+
+.locationSelectWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.secondLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  align-items: center;
+}
