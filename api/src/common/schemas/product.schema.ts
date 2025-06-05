@@ -1,5 +1,5 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
 
 export type ProductDocument = Product & Document;
 
@@ -23,11 +23,11 @@ export class Product {
   @Prop()
   description?: string;
 
-  @Prop({ type: Types.ObjectId, ref: "User", required: true })
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   sellerId!: Types.ObjectId;
 
-  @Prop({ required: true, enum: ["판매중", "판매완료"] })
-  status!: "판매중" | "판매완료";
+  @Prop({ required: true, enum: ['판매중', '판매완료'] })
+  status!: '판매중' | '판매완료';
 
   @Prop({ default: 0 })
   likes!: number;
