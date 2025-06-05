@@ -17,6 +17,9 @@ export class User {
   @Prop({ default: null })
   profileImage?: string;
 
+  @Prop({ default: null })
+  socialId?: string;
+
   @Prop({ required: true, enum: ['local', 'naver'], default: 'local' })
   provider!: 'local' | 'naver';
 

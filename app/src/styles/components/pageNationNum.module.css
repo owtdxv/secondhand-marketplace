@@ -1,0 +1,19 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+}
+.number {
+  display: flex;
+  align-items: center;
+}
+span {
+  font-size: 12px;
+  color: #929292;
+  cursor: default;
+}
+span:last-child {
+  padding: 0 0 0 0x;
+}
+span:not(:last-child) {
+  padding: 0 19px 0 0;
+}
