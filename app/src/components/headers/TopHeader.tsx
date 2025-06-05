@@ -1,21 +1,9 @@
 import styles from "@/styles/components/topHeader.module.css";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 const TopHeader = () => {
-  const [isLogin, setIsLogin] = useState(!!sessionStorage.getItem("token"));
-
-  useEffect(() => {
-    const handleLogin = () => {
-      setIsLogin(!!sessionStorage.getItem("token"));
-    };
-
-    window.addEventListener("login", handleLogin);
-
-    return () => {
-      window.removeEventListener("login", handleLogin);
-    };
-  }, []);
+  const [isLogin, setIsLogin] = useAuth();
 
   return (
     <div className={styles.wrap}>
@@ -41,7 +29,7 @@ const TopHeader = () => {
                 className={styles.link}
                 onClick={() => {
                   sessionStorage.removeItem("token");
-                  setIsLogin(false);
+                  setIsLogin(false); // 너 왜그러는데 대체
                   console.log("로그아웃 dispatchEvent");
                   window.dispatchEvent(new Event("logout"));
                 }}

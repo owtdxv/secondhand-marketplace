@@ -1,13 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
-import { MemoryRouter, Route, Routes, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import styles from "@/styles/components/chatWidget.module.css";
 import ChatRoomListContainer from "../../pages/chatRoomList";
-import { User } from "../../types/user";
 import { motion, AnimatePresence } from "framer-motion";
 import ChatContainer from "../../pages/chat";
 import X from "@/assets/icon/X.png";
-import { io, Socket } from "socket.io-client";
-import axios from "axios";
+import useAuthUser from "../../hooks/useAuthUser";
+import useChatSocket from "../../hooks/useChatSocket";
 
 const LoginPrompt = () => (
   <div style={{ padding: 20, textAlign: "center" }}>
@@ -23,85 +22,17 @@ type ChatWidgetProps = {
 };
 
 const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuthUser();
+  const { socket, connected } = useChatSocket(sessionStorage.getItem("token"));
   const [visible, setVisible] = useState(false);
-  const socketRef = useRef<Socket | null>(null);
-  const [socketConnected, setSocketConnected] = useState(false);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    axios
-      .get("/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setUser(response.data);
-      })
-      .catch(() => {
-        sessionStorage.removeItem("token");
-        setUser(null);
-      })
-      .finally(() => setLoading(false));
-
-    // ✅ logout 이벤트 핸들러 등록
-    const handleLogout = () => {
-      sessionStorage.removeItem("token");
-      setUser(null);
-    };
-
-    window.addEventListener("logout", handleLogout);
-
-    // ✅ 컴포넌트 언마운트 시 이벤트 제거
-    return () => {
-      window.removeEventListener("logout", handleLogout);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!loading) {
-      setVisible(true);
-    }
+    if (!loading) setVisible(true);
   }, [loading]);
 
   const handleClose = () => {
     setVisible(false); // exit 애니메이션 실행
   };
-
-  useEffect(() => {
-    if (user && !socketRef.current) {
-      socketRef.current = io("http://localhost:8000", {
-        auth: {
-          token: sessionStorage.getItem("token"),
-        },
-      });
-
-      socketRef.current.on("connect", () => {
-        setSocketConnected(true);
-      });
-
-      socketRef.current.on("disconnect", () => {
-        console.log("Socket disconnected");
-      });
-    } else {
-      socketRef.current?.disconnect();
-      socketRef.current = null;
-      setSocketConnected(false);
-    }
-
-    return () => {
-      if (socketRef.current && socketRef.current.connected) {
-        console.log("Disconnecting socket on unmount or user change");
-        socketRef.current.disconnect();
-        setSocketConnected(false);
-      }
-    };
-  }, [user]);
 
   return (
     <AnimatePresence
@@ -119,37 +50,32 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ onClose }) => {
         >
           {loading && <div>로딩 중...</div>}
           {!loading && !user && <LoginPrompt />}
-          {!loading && user && socketConnected && socketRef.current && (
-            <>
-              <MemoryRouter>
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      <>
-                        <div className={styles.chatBox}>
-                          <span className={styles.title}>채팅</span>
-                          <img
-                            src={X}
-                            alt="닫기"
-                            className={styles.closeIcon}
-                            onClick={handleClose}
-                          />
-                        </div>
-                        <ChatRoomListContainer
-                          user={user}
-                          socket={socketRef.current}
+          {!loading && user && connected && socket && (
+            <MemoryRouter>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <div className={styles.chatBox}>
+                        <span className={styles.title}>채팅</span>
+                        <img
+                          src={X}
+                          alt="닫기"
+                          className={styles.closeIcon}
+                          onClick={handleClose}
                         />
-                      </>
-                    }
-                  />
-                  <Route
-                    path="/room/:id"
-                    element={<ChatContainer socket={socketRef.current} />}
-                  />
-                </Routes>
-              </MemoryRouter>
-            </>
+                      </div>
+                      <ChatRoomListContainer user={user} socket={socket} />
+                    </>
+                  }
+                />
+                <Route
+                  path="/room/:id"
+                  element={<ChatContainer socket={socket} />}
+                />
+              </Routes>
+            </MemoryRouter>
           )}
         </motion.div>
       )}
