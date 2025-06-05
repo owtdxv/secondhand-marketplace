@@ -1,7 +1,6 @@
 import styles from "@/styles/pages/login.module.css";
 import Logo from "@/assets/Logo_full.png";
 import { LoginProps } from "../../types/auth";
-import NaverLogo from "@/assets/naver_Logo.png";
 
 const Login: React.FC<LoginProps> = ({
   email,
@@ -12,7 +11,6 @@ const Login: React.FC<LoginProps> = ({
   onEmailChange,
   onPasswordChange,
   onLogin,
-  onNaverLogin,
 }) => {
   return (
     <div className={styles.loginPageContainer}>
@@ -69,10 +67,6 @@ const Login: React.FC<LoginProps> = ({
           <span className={styles.separatorMargin}>소셜 로그인</span>
           <span className={styles.separatorLine}></span>
         </div>
-        <button className={styles.naverLoginButton} onClick={onNaverLogin}>
-          <img src={NaverLogo} alt="네이버 로고" className={styles.naverLogo} />
-          <span className={styles.naverText}>네이버 로그인</span>
-        </button>
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
 export interface ProductInfo {
-  _id: string;
-  name: string;
-  price: number;
-  images: string[];
-  lastUpdated: string;
+  photo: string;
+  title: string;
+  price: string;
+  time: string;
 }

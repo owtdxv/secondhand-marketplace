@@ -1,10 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from 'src/common/schemas/product.schema';
 import { UserProductListDocument } from 'src/common/schemas/user-product-lists.schema';
-import { User, UserDocument } from 'src/common/schemas/user.schema';
 
 @Injectable()
 export class ProductsService {
@@ -15,7 +14,6 @@ export class ProductsService {
     @InjectModel('ViewedProducts')
     private readonly viewedProductsModel: Model<UserProductListDocument>,
     private jwtService: JwtService,
-    @InjectModel(User.name) private userModel: Model<ProductDocument>,
   ) {}
 
   /**
@@ -156,195 +154,5 @@ export class ProductsService {
     }
 
     return userLikedList.productIds;
-  }
-
-  //상품 생성시간과 현재시간 비교하는 함수
-  getRelativeTime(date: Date): string {
-    const diffMs = Date.now() - new Date(date).getTime();
-    const diffSec = Math.floor(diffMs / 1000);
-    const diffMin = Math.floor(diffSec / 60);
-    const diffHour = Math.floor(diffMin / 60);
-    const diffDay = Math.floor(diffHour / 24);
-
-    if (diffSec < 60) return '방금 전';
-    if (diffMin < 60) return `${diffMin}분 전`;
-    if (diffHour < 24) return `${diffHour}시간 전`;
-    if (diffDay < 7) return `${diffDay}일 전`;
-    return new Date(date).toLocaleDateString(); // 'YYYY.MM.DD'
-  }
-
-  // 메인에서 전체상품보기로 넘어간경우
-  async findAll({
-    page,
-    limit,
-    filter,
-  }: {
-    page: number;
-    limit: number;
-    filter: string;
-  }) {
-    const sortMap = {
-      //근데 최신순이면 createdAt을 기준으로? 아니면 수정시를 생각해서 updatedAt?
-      //각각 순서대로 최신순, 낮은가격순, 높은 가격순
-      latest: { createdAt: -1 },
-      price_asc: { price: 1 },
-      price_desc: { price: -1 },
-    };
-
-    const sortOption = sortMap[filter] || sortMap['latest'];
-
-    //28개씩 상품들을 나눠서 보여줌
-    const skip = (page - 1) * limit;
-
-    const [rawItems, total] = await Promise.all([
-      this.productModel
-        .find()
-        .sort(sortOption)
-        .skip(skip)
-        .limit(limit)
-        .lean()
-        .exec(),
-      this.productModel.countDocuments(),
-    ]);
-
-    const items = rawItems.map((item) => ({
-      ...item,
-      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
-    }));
-    return {
-      page,
-      totalPages: Math.ceil(total / limit),
-      items,
-    };
-  }
-
-  // 상품을 클릭하여 상세보기로 넘어간경우
-  async getProductById(productId: string, uid: string) {
-    const product = await this.productModel
-      .findByIdAndUpdate(
-        productId,
-        { $inc: { views: 1 } },
-        { new: true, timestamps: false },
-      )
-      .lean();
-
-    if (!product) {
-      throw new NotFoundException('상품을 찾을 수 없습니다.');
-    }
-
-    //로그인한 사용자의 판매상품인경우를 체크하는 변수
-    const isMine = product.sellerId.toString() === uid;
-
-    //판메지의 정보를 가져와야하는데 이렇게 하는게 맞나?
-    const seller: UserDocument = await this.userModel
-      .findById(product.sellerId)
-      .select('displayName profileImage');
-
-    //판매자의 판매중, 판매완료 상품의 수
-    const [onSaleCount, soldOutCount] = await Promise.all([
-      this.productModel.countDocuments({
-        sellerId: product.sellerId,
-        status: '판매중',
-      }),
-      this.productModel.countDocuments({
-        sellerId: product.sellerId,
-        status: '판매완료',
-      }),
-    ]);
-
-    // 좋아요 여부
-    const liked = await this.likedProductsModel.findOne({
-      uid,
-      productIds: product._id,
-    });
-
-    const isLiked = !!liked;
-
-    // viewedProducts에 추가
-    const viewedDoc = await this.viewedProductsModel.findOne({
-      uid: new Types.ObjectId(uid),
-    });
-
-    if (viewedDoc) {
-      // 이미 본 상품의 경우 해당 값을 제거하고
-      viewedDoc.productIds = viewedDoc.productIds.filter(
-        (id) => id.toString() !== productId,
-      );
-
-      // 배열 맨 앞에 추가
-      viewedDoc.productIds.unshift(product._id as Types.ObjectId);
-
-      await viewedDoc.save();
-    } else {
-      await this.viewedProductsModel.create({
-        uid: new Types.ObjectId(uid),
-        productIds: [product._id],
-      });
-    }
-
-    return {
-      ...product,
-      isMine,
-      isLiked,
-      lastUpdated: this.getRelativeTime(new Date((product as any).updatedAt)),
-      seller: {
-        displayName: seller?.displayName,
-        profileImage: seller?.profileImage,
-        onSaleCount,
-        soldOutCount,
-      },
-    };
-  }
-
-  // 좋아요 처리 -> LikedProducts에 추가, 좋아요수 +1,
-  // 좋아요 취소 -> LikedProducts에서 제거, 좋아요수 -1,
-  async toggleLike(productId: string, uid: string) {
-    const product = await this.productModel.findById(productId);
-    if (!product) throw new NotFoundException('상품을 찾을 수 없습니다.');
-
-    const likedDoc = await this.likedProductsModel.findOne({
-      uid: new Types.ObjectId(uid),
-    });
-
-    const alreadyLiked = likedDoc?.productIds?.some(
-      (id) => id.toString() === productId,
-    );
-
-    //이미 좋아요였던 경우
-    if (alreadyLiked) {
-      product.likes = Math.max(0, product.likes - 1);
-      await product.save();
-
-      // LikedProducts에서 해당 상품 제거
-      await this.likedProductsModel.updateOne(
-        { uid: new Types.ObjectId(uid) },
-        { $pull: { productIds: product._id } },
-      );
-
-      return {
-        message: '좋아요가 취소되었습니다.',
-        isLiked: false,
-        likes: product.likes,
-      };
-    } else {
-      product.likes += 1;
-      await product.save();
-
-      if (likedDoc) {
-        likedDoc.productIds.push(product._id as Types.ObjectId);
-        await likedDoc.save();
-      } else {
-        await this.likedProductsModel.create({
-          uid: new Types.ObjectId(uid),
-          productIds: [product._id],
-        });
-      }
-
-      return {
-        message: '좋아요가 추가되었습니다.',
-        isLiked: true,
-        likes: product.likes,
-      };
-    }
   }
 }

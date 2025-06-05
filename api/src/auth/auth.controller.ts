@@ -7,13 +7,11 @@ import {
   Put,
   Query,
   Req,
-  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -71,19 +69,5 @@ export class AuthController {
     const success = (await this.authService.changeDisplayName(uid, displayName))
       .success;
     return this.authService.getProfile(uid);
-  }
-
-  @Get('/naver/callback')
-  async naverLoginCallback(
-    @Query('code') code: string,
-    @Query('state') state: string,
-    @Res() res: Response,
-  ) {
-    console.log(`네이버 콜백 수신: code=${code}, state=${state}`);
-
-    const html = await this.authService.handleNaverCallback(code, state);
-
-    res.setHeader('Content-Type', 'text/html');
-    return res.send(html);
   }
 }

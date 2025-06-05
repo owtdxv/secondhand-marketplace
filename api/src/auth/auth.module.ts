@@ -6,7 +6,6 @@ import { User, UserSchema } from 'src/common/schemas/user.schema';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
-import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { HttpModule } from '@nestjs/axios';
       secret: 'asdfasdf',
       signOptions: { expiresIn: '1d' },
     }),
-    HttpModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
