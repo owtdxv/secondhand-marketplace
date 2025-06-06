@@ -57,9 +57,10 @@ const MainContainer = () => {
       });
 
     axios
-      .get(`/api/product/top-like?page=`)
+      .get(`/api/product/top-like?page=${topLikePage}`)
       .then((res) => {
         console.log(res);
+        setTopLikeData(res.data);
       })
       .catch((err) => {
         console.log(err);
