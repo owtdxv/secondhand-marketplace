@@ -1,14 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Main from "./Main";
+import axios from "axios";
+import { getProductResponse } from "../../types/product";
 
 const MainContainer = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [recentData, setRecentData] = useState<getProductResponse>({
+    page: 1,
+    totalPages: 1,
+    items: [],
+  });
+  const [recentPage, setRecentPage] = useState(1);
 
-  const onPageChange = (page: number) => {
-    setCurrentPage(page);
+  const onRecentPageChange = (page: number) => {
+    setRecentPage(page);
   };
+
+  useEffect(() => {
+    axios
+      .get(`/api/product/recent?page=${recentPage}`)
+      .then((res) => {
+        console.log(res.data);
+        setRecentData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [recentPage]);
   return (
-    <Main totalPage={5} currentPage={currentPage} onPageChange={onPageChange} />
+    <Main recentData={recentData} onRecentPageChange={onRecentPageChange} />
   );
 };
 
