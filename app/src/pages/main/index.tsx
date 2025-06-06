@@ -9,10 +9,30 @@ const MainContainer = () => {
     totalPages: 1,
     items: [],
   });
+  const [topViewData, setTopViewData] = useState({
+    page: 1,
+    totalPages: 1,
+    items: [],
+  });
+  const [topLikeData, setTopLikeData] = useState({
+    page: 1,
+    totalPages: 1,
+    items: [],
+  });
   const [recentPage, setRecentPage] = useState(1);
+  const [topViewPage, setTopViewPage] = useState(1);
+  const [topLikePage, setTopLikePage] = useState(1);
 
   const onRecentPageChange = (page: number) => {
     setRecentPage(page);
+  };
+
+  const onTopViewPageChange = (page: number) => {
+    setTopViewPage(page);
+  };
+
+  const onTopLikePageChange = (page: number) => {
+    setTopLikePage(page);
   };
 
   useEffect(() => {
@@ -25,9 +45,35 @@ const MainContainer = () => {
       .catch((err) => {
         console.log(err);
       });
+
+    axios
+      .get(`/api/product/top-view?page=${topViewPage}`)
+      .then((res) => {
+        console.log(res);
+        setTopViewData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .get(`/api/product/top-like?page=`)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, [recentPage]);
   return (
-    <Main recentData={recentData} onRecentPageChange={onRecentPageChange} />
+    <Main
+      recentData={recentData}
+      topViewData={topViewData}
+      topLikeData={topLikeData}
+      onTopViewPageChange={onTopViewPageChange}
+      onRecentPageChange={onRecentPageChange}
+      onTopLikePageChange={onTopLikePageChange}
+    />
   );
 };
 
