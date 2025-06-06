@@ -1,8 +1,15 @@
-import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Req,
+  UseGuards,
+  ForbiddenException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { ProductsService } from 'src/products/products.service';
-import { filter } from 'rxjs';
 
 @Controller('users')
 export class UsersController {
@@ -24,6 +31,9 @@ export class UsersController {
     @Query('page') page = '1',
     @Query('filter') filter: string,
   ) {
+    if (req.user.uid !== uid) {
+      throw new ForbiddenException('접근 권한이 없습니다.');
+    }
     return this.productService.getSoldProduct(uid, parseInt(page), 10, filter);
   }
 
@@ -35,6 +45,9 @@ export class UsersController {
     @Query('page') page = '1',
     @Query('filter') filter: string,
   ) {
+    if (req.user.uid !== uid) {
+      throw new ForbiddenException('접근 권한이 없습니다.');
+    }
     return this.productService.getSoldOutProduct(
       uid,
       parseInt(page),
@@ -51,6 +64,9 @@ export class UsersController {
     @Query('page') page = '1',
     @Query('filter') filter: string,
   ) {
+    if (req.user.uid !== uid) {
+      throw new ForbiddenException('접근 권한이 없습니다.');
+    }
     return this.productService.getLikedProduct(uid, parseInt(page), 10, filter);
   }
 
@@ -62,6 +78,9 @@ export class UsersController {
     @Query('page') page = '1',
     @Query('filter') filter: string,
   ) {
+    if (req.user.uid !== uid) {
+      throw new ForbiddenException('접근 권한이 없습니다.');
+    }
     return this.productService.getViewedProduct(
       uid,
       parseInt(page),
