@@ -39,7 +39,6 @@ const MainContainer = () => {
     axios
       .get(`/api/product/recent?page=${recentPage}`)
       .then((res) => {
-        console.log(res.data);
         setRecentData(res.data);
       })
       .catch((err) => {
@@ -49,7 +48,6 @@ const MainContainer = () => {
     axios
       .get(`/api/product/top-view?page=${topViewPage}`)
       .then((res) => {
-        console.log(res);
         setTopViewData(res.data);
       })
       .catch((err) => {
@@ -59,13 +57,12 @@ const MainContainer = () => {
     axios
       .get(`/api/product/top-like?page=${topLikePage}`)
       .then((res) => {
-        console.log(res);
         setTopLikeData(res.data);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [recentPage]);
+  }, [recentPage, topLikePage, topViewPage]);
   return (
     <Main
       recentData={recentData}
