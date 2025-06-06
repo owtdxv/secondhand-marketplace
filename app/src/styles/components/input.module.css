@@ -1,0 +1,14 @@
+.input {
+  height: 54px;
+  border: none;
+  border-bottom: 1px solid #929292;
+  font-size: 16px;
+}
+
+.input::placeholder {
+  color: #929292;
+}
+
+.input:focus {
+  outline: none;
+}
