@@ -7,6 +7,7 @@ import SignupContainer from "./pages/signup";
 import SignupComplete from "./components/auth/SignupComplete";
 import ProductListContainer from "./pages/productListPage";
 import { GlobalSocketManager } from "./components/logic/GlobalSocketManager";
+import AddProductContainer from "./pages/addProduct";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/signup" element={<SignupContainer />} />
         <Route path="/signup-complete" element={<SignupComplete />} />
         <Route path="/products" element={<ProductListContainer />} />
+        <Route path="/add-product" element={<AddProductContainer />} />
       </Routes>
     </>
   );

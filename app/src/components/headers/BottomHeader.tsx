@@ -6,6 +6,7 @@ import Logo from "@/assets/Logo.png";
 import chat from "@/assets/icon/chat.png";
 import myPage from "@/assets/icon/person.png";
 import sale from "@/assets/icon/sale.png";
+import { useNavigate } from "react-router-dom";
 
 // Update the import path if the file exists elsewhere, for example:
 import ChatWidget from "../chat/ChatWidget";
@@ -41,11 +42,19 @@ const toggleChatUI = () => {
   isChatOpen = true;
 };
 
-const BottomHeader: React.FC = () => {
+=======
+const BottomHeader = () => {
+  const navigate = useNavigate();
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
-        <img className={styles.logo} src={Logo} alt="로고" />
+        <img
+          onClick={() => {
+            navigate("/");
+          }}
+          className={styles.logo}
+          src={Logo}
+        />
         <input
           className={styles.search}
           type="text"
@@ -54,8 +63,15 @@ const BottomHeader: React.FC = () => {
         />
         <ul className={styles.menu}>
           <li className={styles.item}>
-            <img width={25} src={sale} alt="판매하기 아이콘" />
-            <p className={styles.text}>판매하기</p>
+            <img width={25} src={sale} />
+            <p
+              onClick={() => {
+                navigate("/add-product");
+              }}
+              className={styles.text}
+            >
+              판매하기
+            </p>
           </li>
           <li className={styles.item}>
             <img width={25} src={myPage} alt="마이페이지 아이콘" />
