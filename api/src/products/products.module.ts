@@ -20,5 +20,6 @@ import { User, UserSchema } from 'src/common/schemas/user.schema';
   ],
   controllers: [ProductsController],
   providers: [ProductsService, JwtStrategy],
+  exports: [ProductsService],
 })
 export class ProductsModule {}
