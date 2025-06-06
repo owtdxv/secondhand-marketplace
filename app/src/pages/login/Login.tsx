@@ -71,7 +71,9 @@ const Login: React.FC<LoginProps> = ({
         </div>
         <button className={styles.naverLoginButton} onClick={onNaverLogin}>
           <img src={NaverLogo} alt="네이버 로고" className={styles.naverLogo} />
-          <span className={styles.naverText}>네이버 로그인</span>
+          <span className={styles.naverText} style={{ color: "white" }}>
+            네이버 로그인
+          </span>
         </button>
       </div>
     </div>
