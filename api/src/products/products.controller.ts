@@ -26,6 +26,33 @@ export class ProductsController {
     });
   }
 
+  //최근 올라온 상품 30개 조회
+  @Get('recent')
+  async getRecent(@Query('page') page = '1') {
+    return this.productsService.getRecentProducts({
+      page: parseInt(page),
+      limit: 30,
+    });
+  }
+
+  //좋아요가 많은 상품 상위 30개 조회
+  @Get('top-like')
+  async getTopLike(@Query('page') page = '1') {
+    return this.productsService.getTopLikeProducts({
+      page: parseInt(page),
+      limit: 30,
+    });
+  }
+
+  //조회수가 많은 상품 상위 30개 조회
+  @Get('top-view')
+  async getTopView(@Query('page') page = '1') {
+    return this.productsService.getTopViewProducts({
+      page: parseInt(page),
+      limit: 30,
+    });
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   async getProductDetail(@Param('id') productId: string, @Req() req: any) {
