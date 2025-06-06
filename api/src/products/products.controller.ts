@@ -31,7 +31,7 @@ export class ProductsController {
   async getRecent(@Query('page') page = '1') {
     return this.productsService.getRecentProducts({
       page: parseInt(page),
-      limit: 30,
+      limit: 6,
     });
   }
 
@@ -40,7 +40,7 @@ export class ProductsController {
   async getTopLike(@Query('page') page = '1') {
     return this.productsService.getTopLikeProducts({
       page: parseInt(page),
-      limit: 30,
+      limit: 6,
     });
   }
 
@@ -49,7 +49,7 @@ export class ProductsController {
   async getTopView(@Query('page') page = '1') {
     return this.productsService.getTopViewProducts({
       page: parseInt(page),
-      limit: 30,
+      limit: 6,
     });
   }
 
