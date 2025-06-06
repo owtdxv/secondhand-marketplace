@@ -42,7 +42,6 @@ const toggleChatUI = () => {
   isChatOpen = true;
 };
 
-=======
 const BottomHeader = () => {
   const navigate = useNavigate();
   return (
