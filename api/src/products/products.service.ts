@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  Post,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -511,6 +516,46 @@ export class ProductsService {
       page,
       totalPages,
       items,
+    };
+  }
+
+  //상품 등록
+  async createProduct({ body, uid }: { body: any; uid: string }) {
+    const { images, name, price, category, saleRegion, description, status } =
+      body;
+
+    if (!images || !Array.isArray(images) || images.length === 0)
+      throw new BadRequestException('상품 이미지를 1개 이상 포함해야 합니다.');
+
+    if (!name) throw new BadRequestException('상품명을 입력해주세요.');
+
+    if (!price || typeof price !== 'number')
+      throw new BadRequestException('상품의 가격을 입력해주세요.');
+
+    if (!category)
+      throw new BadRequestException('상품의 카테고리를 입력해주세요.');
+
+    if (!saleRegion)
+      throw new BadRequestException('상품 판매 지역을 입력해주세요.');
+
+    if (!description)
+      throw new BadRequestException('상품에 대한 설명을 입력해주세요.');
+
+    const product = new this.productModel({
+      images,
+      name,
+      price,
+      category,
+      saleRegion,
+      description,
+      status: '판매중',
+      sellerId: uid,
+    });
+
+    await product.save();
+    return {
+      statusCode: 201,
+      message: '상품이 성공적으로 등록되었습니다.',
     };
   }
 }

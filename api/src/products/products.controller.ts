@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
+  Post,
   Put,
   Query,
   Req,
@@ -63,5 +65,12 @@ export class ProductsController {
   @UseGuards(AuthGuard('jwt'))
   async toggleLike(@Param('id') productId: string, @Req() req: any) {
     return this.productsService.toggleLike(productId, req.user.uid);
+  }
+
+  @Post('new')
+  @UseGuards(AuthGuard('jwt'))
+  async createProduct(@Body() body: any, @Req() req: any) {
+    const uid = req.user.uid;
+    return this.productsService.createProduct({ body, uid });
   }
 }
