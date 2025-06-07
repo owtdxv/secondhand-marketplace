@@ -26,9 +26,9 @@ const LoginContainer = () => {
         sessionStorage.setItem("token", accessToken);
         console.log("로그인 dispatchEvent");
         window.dispatchEvent(new Event("login"));
-      }
 
-      navigate("/");
+        navigate("/");
+      }
     };
 
     window.addEventListener("message", handleMessage);
