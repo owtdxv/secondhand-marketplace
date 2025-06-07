@@ -432,81 +432,84 @@ export class ProductsService {
 
   //메인 최근 올라온 상품 최대 30개
   async getRecentProducts({ page, limit }: { page: number; limit: number }) {
+    const maxLimit = 30;
+
     const skip = (page - 1) * limit;
 
-    const [rawItems, total] = await Promise.all([
-      this.productModel
-        .find()
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean()
-        .exec(),
-      this.productModel.countDocuments(),
-    ]);
+    const rawItems = await this.productModel
+      .find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
 
     const items = rawItems.map((item) => ({
       ...item,
       lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
     }));
 
+    const totalPages = Math.ceil(maxLimit / limit);
+
     return {
       page,
-      totalPages: Math.ceil(total / limit),
+      totalPages,
       items,
     };
   }
 
   //메인 좋아요가 많은 상품 최대 30개
   async getTopLikeProducts({ page, limit }: { page: number; limit: number }) {
+    const maxLimit = 30;
+
     const skip = (page - 1) * limit;
 
-    const [rawItems, total] = await Promise.all([
-      this.productModel
-        .find()
-        .sort({ likes: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean()
-        .exec(),
-      this.productModel.countDocuments(),
-    ]);
+    const rawItems = await this.productModel
+      .find()
+      .sort({ likes: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
 
     const items = rawItems.map((item) => ({
       ...item,
       lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
     }));
 
+    const totalPages = Math.ceil(maxLimit / limit);
+
     return {
       page,
-      totalPages: Math.ceil(total / limit),
+      totalPages,
       items,
     };
   }
 
   //메인 조회수가 많은 상품 최대 30개
   async getTopViewProducts({ page, limit }: { page: number; limit: number }) {
+    const maxLimit = 30;
+
     const skip = (page - 1) * limit;
 
-    const [rawItems, total] = await Promise.all([
-      this.productModel
-        .find()
-        .sort({ views: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean()
-        .exec(),
-      this.productModel.countDocuments(),
-    ]);
+    const rawItems = await this.productModel
+      .find()
+      .sort({ views: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
 
     const items = rawItems.map((item) => ({
       ...item,
       lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
     }));
 
+    const totalPages = Math.ceil(maxLimit / limit);
+
     return {
       page,
-      totalPages: Math.ceil(total / limit),
+      totalPages,
       items,
     };
   }

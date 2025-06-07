@@ -5,3 +5,9 @@ export interface ProductInfo {
   images: string[];
   lastUpdated: string;
 }
+
+export interface getProductResponse {
+  items: Array[ProductInfo];
+  page: number;
+  totalPages: number;
+}
