@@ -24,9 +24,11 @@ const LoginContainer = () => {
       const { accessToken } = event.data;
       if (accessToken) {
         sessionStorage.setItem("token", accessToken);
-      }
+        console.log("로그인 dispatchEvent");
+        window.dispatchEvent(new Event("login"));
 
-      navigate("/");
+        navigate("/");
+      }
     };
 
     window.addEventListener("message", handleMessage);
@@ -89,6 +91,8 @@ const LoginContainer = () => {
       });
       const { accessToken } = res.data;
       sessionStorage.setItem("token", accessToken);
+      console.log("로그인 dispatchEvent");
+      window.dispatchEvent(new Event("login"));
       navigate("/");
     } catch (error: any) {
       if (error.response?.status === 401) {

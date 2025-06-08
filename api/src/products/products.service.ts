@@ -1,7 +1,8 @@
 import {
-  ForbiddenException,
+  BadRequestException,
   Injectable,
   NotFoundException,
+  Post,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -23,89 +24,131 @@ export class ProductsService {
   ) {}
 
   /**
-   * 사용자가 "판매중"인 상품을 filter조건에 맞게 반환합니다
+   * 사용자가 "판매중"인 상품을 정렬 조건에 맞게 반환합니다
    * @param uid 사용자 uid
-   * @param filter 최신순(default), 낮은가격순, 높은가격순
+   * @param page 현재 페이지 번호
+   * @param limit 페이지 당 상품 수
+   * @param filter 정렬 조건
    */
-  async getSoldProduct(uid: string, filter: string = '최신순') {
-    let query = this.productModel.find({
-      sellerId: new Types.ObjectId(uid),
-      status: '판매중',
-    });
+  async getSoldProduct(
+    uid: string,
+    page: number,
+    limit: number,
+    filter: string = 'latest',
+  ) {
+    const sellerId = new Types.ObjectId(uid);
+    const sortMap = {
+      latest: { createdAt: -1 },
+      price_asc: { price: 1 },
+      price_desc: { price: -1 },
+    };
+    const sortOption = sortMap[filter] || sortMap['latest'];
 
-    switch (filter) {
-      case '낮은가격순':
-        query = query.sort({ price: 1 });
-        break;
-      case '높은가격순':
-        query = query.sort({ price: -1 });
-        break;
-      case '최신순':
-      default:
-        query = query.sort({ createdAt: -1 });
-        break;
-    }
+    const skip = (page - 1) * limit;
+    const [rawItems, total] = await Promise.all([
+      this.productModel
+        .find({
+          sellerId: sellerId,
+          status: '판매중',
+        })
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.productModel.countDocuments({
+        sellerId: sellerId,
+        status: '판매중',
+      }),
+    ]);
 
-    return await query.exec();
+    const items = rawItems.map((item) => ({
+      ...item,
+      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
+    }));
+    return {
+      page,
+      totalPages: Math.ceil(total / limit),
+      items,
+    };
   }
 
   /**
    * 사용자가 "판매완료"한 상품을 filter조건에 맞게 반환합니다
    * @param uid 사용자 uid
-   * @param filter 최신순(default), 낮은가격순, 높은가격순
+   * @param page 현재 페이지 번호
+   * @param limit 페이지 당 상품 수
+   * @param filter 정렬 조건
    */
-  async getSoldOutProduct(uid: string, filter: string = '최신순') {
-    let query = this.productModel.find({
-      sellerId: new Types.ObjectId(uid),
-      status: '판매완료',
-    });
+  async getSoldOutProduct(
+    uid: string,
+    page: number,
+    limit: number,
+    filter: string = 'latest',
+  ) {
+    const sellerId = new Types.ObjectId(uid);
+    const sortMap = {
+      latest: { createdAt: -1 },
+      price_asc: { price: 1 },
+      price_desc: { price: -1 },
+    };
+    const sortOption = sortMap[filter] || sortMap['latest'];
 
-    switch (filter) {
-      case '낮은가격순':
-        query = query.sort({ price: 1 });
-        break;
-      case '높은가격순':
-        query = query.sort({ price: -1 });
-        break;
-      case '최신순':
-      default:
-        query = query.sort({ createdAt: -1 });
-        break;
-    }
+    const skip = (page - 1) * limit;
+    const [rawItems, total] = await Promise.all([
+      this.productModel
+        .find({
+          sellerId: sellerId,
+          status: '판매완료',
+        })
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.productModel.countDocuments({
+        sellerId: sellerId,
+        status: '판매완료',
+      }),
+    ]);
 
-    return await query.exec();
+    const items = rawItems.map((item) => ({
+      ...item,
+      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
+    }));
+    return {
+      page,
+      totalPages: Math.ceil(total / limit),
+      items,
+    };
   }
 
   /**
    * 사용자가 좋아요 표시한 상품 정보를 filter조건에 맞게 반환합니다
    * @param uid 사용자 uid
-   * @param filter 최신순(default), 낮은가격순, 높은가격순
+   * @param page 현재 페이지 번호
+   * @param limit 페이지 당 상품 수
+   * @param filter 정렬 조건
    */
   async getLikedProduct(
     uid: string,
-    filter: string = '최신순',
-  ): Promise<Product[]> {
-    let sortOption: Record<string, 1 | -1> = { createdAt: -1 }; // 기본값: 상품 등록일 최신순
+    page: number,
+    limit: number,
+    filter: string = 'latest',
+  ) {
+    const sortMap = {
+      latest: { createdAt: -1 },
+      price_asc: { price: 1 },
+      price_desc: { price: -1 },
+    };
+    const sortOption = sortMap[filter] || sortMap['latest'];
 
-    switch (filter) {
-      case '낮은가격순':
-        sortOption = { price: 1 };
-        break;
-      case '높은가격순':
-        sortOption = { price: -1 };
-        break;
-      case '최신순': // 상품의 등록일 기준 최신순 (Product.createdAt)
-      default:
-        sortOption = { createdAt: -1 };
-        break;
-    }
+    const skip = (page - 1) * limit;
 
+    // 1단계: 유저의 찜 목록 가져오기
     const userLikedList = await this.likedProductsModel
       .findOne({ uid: new Types.ObjectId(uid) })
-      .populate<{ productIds: Product[] }>({
-        path: 'productIds',
-        options: { sort: sortOption },
-      })
+      .lean()
       .exec();
 
     if (
@@ -113,53 +156,93 @@ export class ProductsService {
       !userLikedList.productIds ||
       userLikedList.productIds.length === 0
     ) {
-      return [];
+      return {
+        page,
+        totalPages: 0,
+        items: [],
+      };
     }
 
-    return userLikedList.productIds;
+    const likedProductIds = userLikedList.productIds;
+
+    // 2단계: 찜한 상품 중 일부만 정렬 + 페이징해서 가져오기
+    const [items, total] = await Promise.all([
+      this.productModel
+        .find({ _id: { $in: likedProductIds } })
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.productModel.countDocuments({ _id: { $in: likedProductIds } }),
+    ]);
+
+    return {
+      page,
+      totalPages: Math.ceil(total / limit),
+      items,
+    };
   }
 
   /**
    * 사용자가 최근 확인한 상품 정보를 filter조건에 맞게 반환합니다
    * @param uid 사용자 uid
-   * @param filter 최신순(default), 낮은가격순, 높은가격순
+   * @param page 현재 페이지 번호
+   * @param limit 페이지 당 상품 수
+   * @param filter 정렬 조건
    */
   async getViewedProduct(
     uid: string,
-    filter: string = '최신순',
-  ): Promise<Product[]> {
-    let sortOption: Record<string, 1 | -1> = { createdAt: -1 }; // 기본값: 상품 등록일 최신순
+    page: number,
+    limit: number,
+    filter: string = 'latest',
+  ) {
+    const sortMap = {
+      latest: { createdAt: -1 },
+      price_asc: { price: 1 },
+      price_desc: { price: -1 },
+    };
+    const sortOption = sortMap[filter] || sortMap['latest'];
 
-    switch (filter) {
-      case '낮은가격순':
-        sortOption = { price: 1 };
-        break;
-      case '높은가격순':
-        sortOption = { price: -1 };
-        break;
-      case '최신순': // 상품의 등록일 기준 최신순 (Product.createdAt)
-      default:
-        sortOption = { createdAt: -1 };
-        break;
-    }
+    const skip = (page - 1) * limit;
 
-    const userLikedList = await this.likedProductsModel
+    // 1단계: 유저의 찜 목록 가져오기
+    const userViewedList = await this.viewedProductsModel
       .findOne({ uid: new Types.ObjectId(uid) })
-      .populate<{ productIds: Product[] }>({
-        path: 'productIds',
-        options: { sort: sortOption },
-      })
+      .lean()
       .exec();
 
     if (
-      !userLikedList ||
-      !userLikedList.productIds ||
-      userLikedList.productIds.length === 0
+      !userViewedList ||
+      !userViewedList.productIds ||
+      userViewedList.productIds.length === 0
     ) {
-      return [];
+      return {
+        page,
+        totalPages: 0,
+        items: [],
+      };
     }
 
-    return userLikedList.productIds;
+    const likedProductIds = userViewedList.productIds;
+
+    // 2단계: 찜한 상품 중 일부만 정렬 + 페이징해서 가져오기
+    const [items, total] = await Promise.all([
+      this.productModel
+        .find({ _id: { $in: likedProductIds } })
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.productModel.countDocuments({ _id: { $in: likedProductIds } }),
+    ]);
+
+    return {
+      page,
+      totalPages: Math.ceil(total / limit),
+      items,
+    };
   }
 
   //상품 생성시간과 현재시간 비교하는 함수
@@ -352,44 +435,127 @@ export class ProductsService {
     }
   }
 
-  // 판매상태 변경 (uid가 sellerId와 동일한지 체크후 상태 변경)
-  async updateProductStatus(
-    productId: string,
-    status: '판매중' | '판매완료',
-    uid: string,
-  ) {
-    const product = await this.productModel.findById(productId);
-    if (!product) {
-      throw new NotFoundException('상품을 찾을 수 없습니다.');
-    }
+  //메인 최근 올라온 상품 최대 30개
+  async getRecentProducts({ page, limit }: { page: number; limit: number }) {
+    const maxLimit = 30;
 
-    if (product.sellerId.toString() !== uid) {
-      throw new ForbiddenException('수정 권한이 없습니다.');
-    }
+    const skip = (page - 1) * limit;
 
-    product.status = status;
-    await product.save();
+    const rawItems = await this.productModel
+      .find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
+
+    const items = rawItems.map((item) => ({
+      ...item,
+      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
+    }));
+
+    const totalPages = Math.ceil(maxLimit / limit);
 
     return {
-      result: true,
-      message: '상품 상태가 변경되었습니다.',
-      status: status,
+      page,
+      totalPages,
+      items,
     };
   }
 
-  // 판매상품 삭제(uid와 sellerId가 동일한 경우만 삭제 가능)
-  async deleteProduct(productId: string, uid: string) {
-    const product = await this.productModel.findById(productId);
-    if (!product) {
-      throw new NotFoundException('상품을 찾을 수 없습니다.');
-    }
+  //메인 좋아요가 많은 상품 최대 30개
+  async getTopLikeProducts({ page, limit }: { page: number; limit: number }) {
+    const maxLimit = 30;
 
-    if (product.sellerId.toString() !== uid) {
-      throw new ForbiddenException('삭제 권한이 없습니다.');
-    }
+    const skip = (page - 1) * limit;
 
-    await product.deleteOne();
+    const rawItems = await this.productModel
+      .find()
+      .sort({ likes: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
 
-    return { result: true, message: '상품이 삭제되었습니다.' };
+    const items = rawItems.map((item) => ({
+      ...item,
+      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
+    }));
+
+    const totalPages = Math.ceil(maxLimit / limit);
+
+    return {
+      page,
+      totalPages,
+      items,
+    };
+  }
+
+  //메인 조회수가 많은 상품 최대 30개
+  async getTopViewProducts({ page, limit }: { page: number; limit: number }) {
+    const maxLimit = 30;
+
+    const skip = (page - 1) * limit;
+
+    const rawItems = await this.productModel
+      .find()
+      .sort({ views: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+      .exec();
+
+    const items = rawItems.map((item) => ({
+      ...item,
+      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
+    }));
+
+    const totalPages = Math.ceil(maxLimit / limit);
+
+    return {
+      page,
+      totalPages,
+      items,
+    };
+  }
+
+  //상품 등록
+  async createProduct({ body, uid }: { body: any; uid: string }) {
+    const { images, name, price, category, saleRegion, description, status } =
+      body;
+
+    if (!images || !Array.isArray(images) || images.length === 0)
+      throw new BadRequestException('상품 이미지를 1개 이상 포함해야 합니다.');
+
+    if (!name) throw new BadRequestException('상품명을 입력해주세요.');
+
+    if (!price || typeof price !== 'number')
+      throw new BadRequestException('상품의 가격을 입력해주세요.');
+
+    if (!category)
+      throw new BadRequestException('상품의 카테고리를 입력해주세요.');
+
+    if (!saleRegion)
+      throw new BadRequestException('상품 판매 지역을 입력해주세요.');
+
+    if (!description)
+      throw new BadRequestException('상품에 대한 설명을 입력해주세요.');
+
+    const product = new this.productModel({
+      images,
+      name,
+      price,
+      category,
+      saleRegion,
+      description,
+      status: '판매중',
+      sellerId: uid,
+    });
+
+    await product.save();
+    return {
+      statusCode: 201,
+      message: '상품이 성공적으로 등록되었습니다.',
+    };
   }
 }

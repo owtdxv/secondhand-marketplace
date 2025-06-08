@@ -1,14 +1,77 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Main from "./Main";
+import axios from "axios";
+import { getProductResponse } from "../../types/product";
 
 const MainContainer = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [recentData, setRecentData] = useState<getProductResponse>({
+    page: 1,
+    totalPages: 1,
+    items: [],
+  });
+  const [topViewData, setTopViewData] = useState({
+    page: 1,
+    totalPages: 1,
+    items: [],
+  });
+  const [topLikeData, setTopLikeData] = useState({
+    page: 1,
+    totalPages: 1,
+    items: [],
+  });
+  const [recentPage, setRecentPage] = useState(1);
+  const [topViewPage, setTopViewPage] = useState(1);
+  const [topLikePage, setTopLikePage] = useState(1);
 
-  const onPageChange = (page: number) => {
-    setCurrentPage(page);
+  const onRecentPageChange = (page: number) => {
+    setRecentPage(page);
   };
+
+  const onTopViewPageChange = (page: number) => {
+    setTopViewPage(page);
+  };
+
+  const onTopLikePageChange = (page: number) => {
+    setTopLikePage(page);
+  };
+
+  useEffect(() => {
+    axios
+      .get(`/api/product/recent?page=${recentPage}`)
+      .then((res) => {
+        setRecentData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .get(`/api/product/top-view?page=${topViewPage}`)
+      .then((res) => {
+        setTopViewData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .get(`/api/product/top-like?page=${topLikePage}`)
+      .then((res) => {
+        setTopLikeData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [recentPage, topLikePage, topViewPage]);
   return (
-    <Main totalPage={5} currentPage={currentPage} onPageChange={onPageChange} />
+    <Main
+      recentData={recentData}
+      topViewData={topViewData}
+      topLikeData={topLikeData}
+      onTopViewPageChange={onTopViewPageChange}
+      onRecentPageChange={onRecentPageChange}
+      onTopLikePageChange={onTopLikePageChange}
+    />
   );
 };
 

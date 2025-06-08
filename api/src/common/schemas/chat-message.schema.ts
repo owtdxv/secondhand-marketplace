@@ -1,14 +1,14 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
 
 export type MessageDocument = Message & Document;
 
 @Schema()
 export class Message {
-  @Prop({ type: Types.ObjectId, ref: "ChatRoom", required: true })
+  @Prop({ type: Types.ObjectId, ref: 'ChatRoom', required: true })
   chatRoomId!: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: "User", required: true })
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   senderId!: Types.ObjectId;
 
   @Prop({ required: true })
@@ -17,7 +17,7 @@ export class Message {
   @Prop({ default: Date.now })
   sentAt!: Date;
 
-  @Prop({ default: false })
+  @Prop({ type: Map, of: Boolean, default: {} })
   read!: boolean;
 }
 

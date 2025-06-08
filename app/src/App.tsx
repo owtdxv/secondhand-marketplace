@@ -6,23 +6,22 @@ import LoginContainer from "./pages/login";
 import SignupContainer from "./pages/signup";
 import SignupComplete from "./components/auth/SignupComplete";
 import ProductListContainer from "./pages/productListPage";
-import ProductDetailPageContainer from "./pages/productDetailPage";
+import { GlobalSocketManager } from "./components/logic/GlobalSocketManager";
+import AddProductContainer from "./pages/addProduct";
 
 function App() {
   return (
     <>
       <TopHeader />
       <BottomHeader />
+      <GlobalSocketManager />
       <Routes>
         <Route path="/" element={<MainContainer />} />
         <Route path="/login" element={<LoginContainer />} />
         <Route path="/signup" element={<SignupContainer />} />
         <Route path="/signup-complete" element={<SignupComplete />} />
         <Route path="/products" element={<ProductListContainer />} />
-        <Route
-          path="/products/:productId"
-          element={<ProductDetailPageContainer />}
-        />
+        <Route path="/add-product" element={<AddProductContainer />} />
       </Routes>
     </>
   );
