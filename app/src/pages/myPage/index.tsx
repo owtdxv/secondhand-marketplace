@@ -70,6 +70,10 @@ const MyPageContainer = () => {
     setPage(page);
   };
 
+  const onChangeFilter = (filter: string) => {
+    setFilter(filter);
+  };
+
   if (!token) {
     return <div>Loading...</div>;
   }
@@ -79,8 +83,10 @@ const MyPageContainer = () => {
       data={data}
       page={page}
       editMode={editMode}
+      filter={filter}
       handleEditMode={handleEditMode}
       onChangePage={onChangePage}
+      onChangeFilter={onChangeFilter}
     />
   );
 };

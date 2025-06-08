@@ -6,16 +6,20 @@ interface PropsType {
   page: string;
   editMode: boolean;
   data: ProductInfo[];
+  filter?: string;
   handleEditMode: () => void;
   onChangePage: (page: string) => void;
+  onChangeFilter: (filter: string) => void;
 }
 
 const MyPage = ({
   page,
   editMode,
   data,
+  filter,
   handleEditMode,
   onChangePage,
+  onChangeFilter,
 }: PropsType) => {
   return (
     <div className={styles.wrap}>
@@ -88,10 +92,20 @@ const MyPage = ({
           </div>
           <div className={styles.bottomContent}>
             {page === "my-product" ? (
-              <Content data={data} title="내 상품" />
+              <Content
+                data={data}
+                title="내 상품"
+                filter={filter}
+                onChangeFilter={onChangeFilter}
+              />
             ) : null}
             {page === "liked-product" ? (
-              <Content data={data} title="좋아요 한 상품" />
+              <Content
+                data={data}
+                title="좋아요 한 상품"
+                filter={filter}
+                onChangeFilter={onChangeFilter}
+              />
             ) : null}
             {page === "recent-view" ? (
               <Content data={data} title="최근 본 상품" />
