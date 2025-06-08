@@ -10,6 +10,14 @@
   background-color: #d9d9d9;
 }
 
+/* 김효진 추가함 */
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
 .title {
   width: 175px;
   height: 19px;

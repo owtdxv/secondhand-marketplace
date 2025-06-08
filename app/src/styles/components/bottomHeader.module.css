@@ -19,6 +19,7 @@
 }
 
 .search {
+  position: relative;
   border: none;
   width: 615px;
   height: 40px;
@@ -48,4 +49,26 @@
 .text {
   height: 19px;
   margin: 0;
+}
+
+/* 김효진 추가 */
+.searchDropdown {
+  position: absolute;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  width: 615px;
+  height: 163px;
+  background-color: white;
+  box-shadow: -3px 10px 10px rgba(0, 0, 0, 0.25);
+
+  top: calc(100% + 12px);
+  right: 16px;
+}
+.searchInput {
+  position: relative;
+  outline: none;
+  border: none;
+  width: 615px;
+  height: 40px;
+  border-bottom: 2px solid #61a872;
 }
