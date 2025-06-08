@@ -7,7 +7,7 @@ export interface ProductInfo {
 }
 
 export interface getProductResponse {
-  items: Array[ProductInfo];
+  items: ProductInfo[];
   page: number;
   totalPages: number;
 }

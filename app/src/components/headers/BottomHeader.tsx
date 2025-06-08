@@ -61,18 +61,21 @@ const BottomHeader = () => {
           aria-label="상품 검색"
         />
         <ul className={styles.menu}>
-          <li className={styles.item}>
+          <li
+            onClick={() => {
+              navigate("/add-product");
+            }}
+            className={styles.item}
+          >
             <img width={25} src={sale} />
-            <p
-              onClick={() => {
-                navigate("/add-product");
-              }}
-              className={styles.text}
-            >
-              판매하기
-            </p>
+            <p className={styles.text}>판매하기</p>
           </li>
-          <li className={styles.item}>
+          <li
+            onClick={() => {
+              navigate("/mypage");
+            }}
+            className={styles.item}
+          >
             <img width={25} src={myPage} alt="마이페이지 아이콘" />
             <p className={styles.text}>마이페이지</p>
           </li>
