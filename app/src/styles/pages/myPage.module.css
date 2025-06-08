@@ -49,6 +49,15 @@
   display: flex;
 }
 
+.userInfo > input {
+  border: none;
+  border-bottom: 1px solid black;
+}
+
+.userInfo > input:focus {
+  outline: none;
+}
+
 .profile {
   width: 87px;
   height: 87px;

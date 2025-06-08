@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import MyPage from "./MyPage";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export const data = [
   {
@@ -53,6 +53,7 @@ const MyPageContainer = () => {
   const [page, setPage] = useState<string>("my-product");
   const [editMode, setEditMode] = useState<boolean>(false);
   const [filter, setFilter] = useState<string>();
+  const [nickName, setNickName] = useState<string>("내가 이 구역 판매왕");
 
   useEffect(() => {
     if (!token) {
@@ -74,6 +75,19 @@ const MyPageContainer = () => {
     setFilter(filter);
   };
 
+  //엔터 클릭 시 작동되는 함수
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setEditMode(false);
+      //엔터 시 작동 상황을 이곳에 기재
+    }
+  };
+
+  const onChangeNickName = (e: any) => {
+    setNickName(e);
+    console.log(nickName);
+  };
+
   if (!token) {
     return <div>Loading...</div>;
   }
@@ -84,9 +98,12 @@ const MyPageContainer = () => {
       page={page}
       editMode={editMode}
       filter={filter}
+      nickName={nickName}
       handleEditMode={handleEditMode}
       onChangePage={onChangePage}
       onChangeFilter={onChangeFilter}
+      handleKeyDown={handleKeyDown}
+      onChangeNickName={onChangeNickName}
     />
   );
 };

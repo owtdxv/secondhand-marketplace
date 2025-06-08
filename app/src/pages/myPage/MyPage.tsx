@@ -7,9 +7,12 @@ interface PropsType {
   editMode: boolean;
   data: ProductInfo[];
   filter?: string;
+  nickName: string;
   handleEditMode: () => void;
   onChangePage: (page: string) => void;
   onChangeFilter: (filter: string) => void;
+  handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onChangeNickName: (e: any) => void;
 }
 
 const MyPage = ({
@@ -17,9 +20,12 @@ const MyPage = ({
   editMode,
   data,
   filter,
+  nickName,
   handleEditMode,
   onChangePage,
   onChangeFilter,
+  handleKeyDown,
+  onChangeNickName,
 }: PropsType) => {
   return (
     <div className={styles.wrap}>
@@ -48,7 +54,11 @@ const MyPage = ({
                       style={{
                         borderBottom: "1px solid black",
                       }}
-                      value="내가 이 구역 판매왕"
+                      onKeyDown={handleKeyDown}
+                      value={nickName}
+                      onChange={(e) => {
+                        onChangeNickName(e.target.value);
+                      }}
                     />
                   ) : (
                     <h1 className={styles.nickName}>
