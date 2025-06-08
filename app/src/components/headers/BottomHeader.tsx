@@ -7,6 +7,7 @@ import chat from "@/assets/icon/chat.png";
 import myPage from "@/assets/icon/person.png";
 import sale from "@/assets/icon/sale.png";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 // Update the import path if the file exists elsewhere, for example:
 import ChatWidget from "../chat/ChatWidget";
@@ -43,7 +44,24 @@ const toggleChatUI = () => {
 };
 
 const BottomHeader = () => {
+  const [showSearchDiv, setShowSearchDiv] = useState(false);
+  const [inputValue, setInputValue] = useState(false);
   const navigate = useNavigate();
+
+  const clickSearchInput = () => {
+    setShowSearchDiv((prev) => !prev);
+  };
+
+  const searchProduct = async () => {
+    try {
+      const res = await axios.get("/api/product/search", {
+        params: { inputValue },
+      });
+      setShowSearchDiv(false);
+    } catch (err) {
+      console.error("상태 변경 실패", err);
+    }
+  };
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
@@ -55,11 +73,13 @@ const BottomHeader = () => {
           src={Logo}
         />
         <input
-          className={styles.search}
+          className={styles.searchInput}
           type="text"
-          placeholder="상품명을 검색해보세요."
-          aria-label="상품 검색"
+          placeholder="상품명을 검색해보세요"
+          onFocus={() => setShowSearchDiv(true)}
+          onBlur={() => setTimeout(() => setShowSearchDiv(false), 150)}
         />
+        {showSearchDiv && <div className={styles.searchDropdown}>adsf</div>}
         <ul className={styles.menu}>
           <li className={styles.item}>
             <img width={25} src={sale} />
