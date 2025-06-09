@@ -2,8 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  Post,
-  UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -576,7 +575,7 @@ export class ProductsService {
     }
 
     if (product.sellerId.toString() !== uid) {
-      throw new UnauthorizedException('수정 권한이 없습니다.');
+      throw new ForbiddenException('수정 권한이 없습니다.');
     }
 
     const allowedFields = [
