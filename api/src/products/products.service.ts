@@ -315,13 +315,14 @@ export class ProductsService {
         { new: true, timestamps: false },
       )
       .lean();
+    // console.log(product);
 
     if (!product) {
       throw new NotFoundException('상품을 찾을 수 없습니다.');
     }
 
     //로그인한 사용자의 판매상품인경우를 체크하는 변수
-    const isMine = uid ? product.sellerId.toString() === uid : false;
+    const isMine = uid == '' ? product.sellerId.toString() === uid : false;
 
     //판메지의 정보를 가져와야하는데 이렇게 하는게 맞나?
     const seller: UserDocument = await this.userModel
@@ -343,10 +344,10 @@ export class ProductsService {
     let isLiked = false;
     let isUser = false;
     // 로그인한 사용자의 경우 좋아요와, 최근 본 상품에 등록
-    if (uid) {
+    if (uid != '') {
       isUser = true;
       const liked = await this.likedProductsModel.findOne({
-        uid,
+        uid: new Types.ObjectId(uid),
         productIds: product._id,
       });
       isLiked = !!liked;
@@ -398,6 +399,7 @@ export class ProductsService {
       (id) => id.toString() === productId,
     );
 
+    console.log('이미 좋아요 처리' + alreadyLiked);
     //이미 좋아요였던 경우
     if (alreadyLiked) {
       product.likes = Math.max(0, product.likes - 1);

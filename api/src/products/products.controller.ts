@@ -69,9 +69,8 @@ export class ProductsController {
       const token = authHeader.split(' ')[1];
       try {
         const payload: any = this.jwtService.verify(token);
-        uid = payload.uid;
+        uid = payload.sub;
       } catch {
-        // 토큰이 잘못됐더라도 상세는 볼 수 있어야 하므로 uid = null 처리
         uid = '';
       }
     }
