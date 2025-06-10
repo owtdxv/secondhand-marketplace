@@ -60,6 +60,62 @@ export class ProductsController {
     });
   }
 
+  // 상품 최근 검색 키워드 얻어오기
+  @Get('recent-keywords')
+  async recentKeywords(@Req() req: any) {
+    const authHeader = req.headers.authorization;
+    let uid: string = '';
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const payload: any = this.jwtService.verify(token);
+        uid = payload.sub;
+      } catch {
+        uid = '';
+      }
+    }
+    return this.productsService.getRecentKeywords(uid);
+  }
+
+  @Delete('recent-keywords')
+  async deleteRecentKeywords(
+    @Query('keyword') keyword: string,
+    @Req() req: any,
+  ) {
+    const authHeader = req.headers.authorization;
+    let uid: string = '';
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const payload: any = this.jwtService.verify(token);
+        uid = payload.sub;
+      } catch {
+        uid = '';
+      }
+    }
+    return this.productsService.deleteRecentKeywords(keyword, uid);
+  }
+
+  // 삼품 검색시 최근검색어에 추가 및 상품 검색
+  @Get('search')
+  async searchProducts(@Query('input') input: string, @Req() req: any) {
+    const authHeader = req.headers.authorization;
+    let uid: string = '';
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const payload: any = this.jwtService.verify(token);
+        uid = payload.sub;
+      } catch {
+        uid = '';
+      }
+    }
+    return this.productsService.searchProducts(input, uid);
+  }
+
   @Get(':id')
   async getProductDetail(@Param('id') productId: string, @Req() req: any) {
     const authHeader = req.headers.authorization;

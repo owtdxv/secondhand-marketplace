@@ -85,16 +85,6 @@ const ProductDetailPageContainer = () => {
             likes: res.data.likes,
           });
         });
-      // // 좋아요 상태 반영
-      // setProduct((prev) =>
-      //   prev
-      //     ? {
-      //         ...prev,
-      //         likes: prev.isLiked ? prev.likes - 1 : prev.likes + 1,
-      //       }
-      //     : prev
-      // );
-      // console.log(product);
     } catch (err) {
       console.error("좋아요 요청 실패", err);
     }

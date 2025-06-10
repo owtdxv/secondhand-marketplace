@@ -7,6 +7,10 @@ import { Product, ProductSchema } from 'src/common/schemas/product.schema';
 import { UserProductListSchema } from 'src/common/schemas/user-product-lists.schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { User, UserSchema } from 'src/common/schemas/user.schema';
+import {
+  RecentSearch,
+  RecentSearchSchema,
+} from 'src/common/schemas/recentSearch';
 
 @Module({
   imports: [
@@ -15,6 +19,7 @@ import { User, UserSchema } from 'src/common/schemas/user.schema';
       { name: User.name, schema: UserSchema },
       { name: 'LikedProducts', schema: UserProductListSchema },
       { name: 'ViewedProducts', schema: UserProductListSchema },
+      { name: RecentSearch.name, schema: RecentSearchSchema },
     ]),
     AuthModule,
   ],
