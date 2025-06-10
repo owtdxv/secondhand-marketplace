@@ -53,6 +53,7 @@
 
 /* 김효진 추가 */
 .searchDropdown {
+  z-index: 1000;
   position: absolute;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;

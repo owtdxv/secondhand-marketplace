@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createRoot, Root } from "react-dom/client";
 
 import styles from "@/styles/components/bottomHeader.module.css";
@@ -6,12 +6,11 @@ import Logo from "@/assets/Logo.png";
 import chat from "@/assets/icon/chat.png";
 import myPage from "@/assets/icon/person.png";
 import sale from "@/assets/icon/sale.png";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import closeButton from "../../assets/icon/Close.png";
 // Update the import path if the file exists elsewhere, for example:
 import ChatWidget from "../chat/ChatWidget";
-import { ProductInfo } from "../../types/product";
 
 let chatRoot: Root | null = null;
 let isChatOpen = false;
@@ -48,8 +47,16 @@ const BottomHeader = () => {
   const [showSearchDiv, setShowSearchDiv] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [recentKeywords, setRecentKeywords] = useState([""]);
-  const [products, setProducts] = useState<ProductInfo>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // /search가 아닌경우에는 검색갑 초기화
+  useEffect(() => {
+    if (location.pathname !== "/search") {
+      setInputValue("");
+      setShowSearchDiv(false);
+    }
+  }, [location.pathname]);
 
   const fetchRecentKeywords = async () => {
     try {
@@ -76,21 +83,6 @@ const BottomHeader = () => {
     }
   };
 
-  const handleSearch = async () => {
-    try {
-      const token = sessionStorage.getItem("token");
-      const res = await axios.get("/api/product/search", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { input: inputValue },
-      });
-      setProducts(res.data); // 검색된 상품들 저장
-      // 이제 저장 후에 검색 화면 제작하기
-      setShowSearchDiv(false);
-    } catch (err) {
-      console.error("검색 실패", err);
-    }
-  };
-
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
@@ -103,6 +95,7 @@ const BottomHeader = () => {
         />
         <div className={styles.search}>
           <input
+            id="search-input"
             className={styles.searchInput}
             type="text"
             onChange={(e) => setInputValue(e.target.value)}
@@ -111,9 +104,16 @@ const BottomHeader = () => {
               setShowSearchDiv(true);
               fetchRecentKeywords();
             }}
-            onBlur={() => setTimeout(() => setShowSearchDiv(false), 150)}
+            value={inputValue}
+            onBlur={() => setTimeout(() => setShowSearchDiv(false), 250)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") handleSearch();
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (inputValue.trim()) {
+                  navigate(`/search?input=${encodeURIComponent(inputValue)}`);
+                  setShowSearchDiv(false);
+                }
+              }
             }}
           />
           {showSearchDiv && (
@@ -124,8 +124,18 @@ const BottomHeader = () => {
               ) : (
                 <div className={styles.keywordContainer}>
                   {recentKeywords.map((keyword, i) => (
-                    <div className={styles.keywords}>
-                      <span>{keyword}</span>
+                    <div className={styles.keywords} key={i}>
+                      <span
+                        onClick={() => {
+                          navigate(
+                            `/search?input=${encodeURIComponent(keyword)}`
+                          );
+                          setShowSearchDiv(false);
+                          setInputValue(keyword);
+                        }}
+                      >
+                        {keyword}
+                      </span>
                       <img
                         src={closeButton}
                         style={{ width: "14px", height: "14px" }}

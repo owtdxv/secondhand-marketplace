@@ -28,7 +28,7 @@ export class ProductsController {
   ) {
     return this.productsService.findAll({
       page: parseInt(page),
-      limit: 28,
+      limit: 30,
       filter,
     });
   }
@@ -100,7 +100,12 @@ export class ProductsController {
 
   // 삼품 검색시 최근검색어에 추가 및 상품 검색
   @Get('search')
-  async searchProducts(@Query('input') input: string, @Req() req: any) {
+  async searchProducts(
+    @Query('input') input: string,
+    @Query('page') page = '1',
+    @Query('filter') filter: string,
+    @Req() req: any,
+  ) {
     const authHeader = req.headers.authorization;
     let uid: string = '';
 
@@ -109,11 +114,18 @@ export class ProductsController {
       try {
         const payload: any = this.jwtService.verify(token);
         uid = payload.sub;
+        console.log('asdf' + uid);
       } catch {
         uid = '';
       }
     }
-    return this.productsService.searchProducts(input, uid);
+    return this.productsService.searchProducts({
+      input,
+      uid,
+      page: parseInt(page),
+      limit: 30,
+      filter,
+    });
   }
 
   @Get(':id')

@@ -687,29 +687,63 @@ export class ProductsService {
       keywords: updated?.keywords ?? [],
     };
   }
+  //검색 상품 가져오기
+  async searchProducts({
+    input,
+    uid,
+    page,
+    limit,
+    filter,
+  }: {
+    input: string;
+    uid: string;
+    page: number;
+    limit: number;
+    filter: string;
+  }) {
+    const sortMap = {
+      latest: { updatedAt: -1 },
+      price_asc: { price: 1 },
+      price_desc: { price: -1 },
+    };
+    const sortOption = sortMap[filter] || sortMap['latest'];
 
-  async searchProducts(input: string, uid: string) {
-    // 검색 실행
-    const products = await this.productModel
-      .find({
+    const skip = (page - 1) * limit;
+
+    const [rawItems, total] = await Promise.all([
+      this.productModel
+        .find({
+          name: { $regex: input, $options: 'i' },
+        })
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.productModel.countDocuments({
         name: { $regex: input, $options: 'i' },
-      })
-      .sort({ updatedAt: -1 });
+      }),
+    ]);
 
+    const items = rawItems.map((item) => ({
+      ...item,
+      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
+    }));
     // 로그인이 되어있는 경우에는 최근 검색어에 추가
     if (Types.ObjectId.isValid(uid)) {
+      const normalizedInput = input.trim().toLowerCase();
+
       const recent = await this.recentSearchModel.findOne({
         uid: new Types.ObjectId(uid),
       });
 
       if (recent) {
-        // 기존에 있던 검색어 제거
-        recent.keywords = recent.keywords.filter((kw) => kw !== input);
+        recent.keywords = recent.keywords.filter(
+          (kw) => kw.trim().toLowerCase() !== normalizedInput,
+        );
 
-        // 맨 앞에 추가
-        recent.keywords.unshift(input);
+        recent.keywords.unshift(input); // 원래 입력값 그대로 추가
 
-        // 최대 10개 유지
         if (recent.keywords.length > 5) {
           recent.keywords = recent.keywords.slice(0, 5);
         }
@@ -723,6 +757,11 @@ export class ProductsService {
       }
     }
 
-    return products;
+    return {
+      page,
+      totalPages: Math.ceil(total / limit),
+      totalProduct: total,
+      items,
+    };
   }
 }
