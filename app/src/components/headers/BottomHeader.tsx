@@ -4,6 +4,7 @@ import { createRoot, Root } from "react-dom/client";
 import styles from "@/styles/components/bottomHeader.module.css";
 import Logo from "@/assets/Logo.png";
 import chat from "@/assets/icon/chat.png";
+import gemini from "@/assets/icon/gemini.png";
 import myPage from "@/assets/icon/person.png";
 import sale from "@/assets/icon/sale.png";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -11,9 +12,13 @@ import axios from "axios";
 import closeButton from "../../assets/icon/Close.png";
 // Update the import path if the file exists elsewhere, for example:
 import ChatWidget from "../chat/ChatWidget";
+import GeminiWidget from "../Gemini/GeminiWidget";
 
 let chatRoot: Root | null = null;
 let isChatOpen = false;
+
+let geminiRoot: Root | null = null;
+let isGeminiOpen = false;
 
 const toggleChatUI = () => {
   const chatContainer = document.getElementById("chat-root");
@@ -40,6 +45,31 @@ const toggleChatUI = () => {
 
   window.dispatchEvent(new Event("chatWidgetOpen"));
   isChatOpen = true;
+};
+
+const toggleGeminiUI = () => {
+  const geminiContainer = document.getElementById("gemini-root");
+  if (!geminiContainer) return;
+
+  if (isGeminiOpen) {
+    return;
+  }
+
+  if (!geminiRoot) {
+    geminiRoot = createRoot(geminiContainer);
+  }
+
+  geminiRoot.render(
+    <GeminiWidget
+      onClose={() => {
+        geminiRoot?.unmount();
+        geminiRoot = null;
+        isGeminiOpen = false;
+      }}
+    />
+  );
+
+  isGeminiOpen = true;
 };
 
 const BottomHeader = () => {
@@ -189,6 +219,14 @@ const BottomHeader = () => {
           >
             <img width={25} src={chat} alt="채팅하기 아이콘" />
             <p className={styles.text}>채팅하기</p>
+          </li>
+          <li
+            className={styles.item}
+            onClick={toggleGeminiUI}
+            style={{ cursor: "pointer" }}
+          >
+            <img width={25} src={gemini} alt="Gemini 아이콘" />
+            <p className={styles.text}>Gemini</p>
           </li>
         </ul>
       </div>
