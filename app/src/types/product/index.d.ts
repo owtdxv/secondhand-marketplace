@@ -11,3 +11,11 @@ export interface getProductResponse {
   page: number;
   totalPages: number;
 }
+
+export interface createProduct {
+  name?: string;
+  category?: string;
+  region?: string;
+  price?: number;
+  description?: string;
+}
