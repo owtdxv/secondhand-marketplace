@@ -86,19 +86,19 @@ const AddProductContainer = () => {
 
       console.log(postData);
 
-      // await axios
-      //   .post("/api/product/new", postData, {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //   })
-      //   .then((res) => {
-      //     console.log(res);
-      //     navigate("/");
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
+      await axios
+        .post("/api/product/new", postData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          console.log(res);
+          navigate("/");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } catch (err) {
       console.error("상품 등록 실패:", err);
     }
