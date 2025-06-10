@@ -10,6 +10,7 @@
 }
 .title {
   font-size: 24px;
+  font-weight: bold;
   padding-bottom: 19px;
 }
 .filter {

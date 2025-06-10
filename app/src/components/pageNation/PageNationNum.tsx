@@ -24,11 +24,14 @@ const PageNationNum = ({
           marginRight: "10px",
           cursor: currentPage === 1 ? "not-allowed" : "default",
         }}
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={
+          currentPage === 1 ? () => {} : () => onPageChange(currentPage - 1)
+        }
       />
       <div className={styles.number}>
         {pages.map((num) => (
           <span
+            className={styles.span}
             style={currentPage === num ? { color: "#61A872" } : {}}
             key={num}
             onClick={() => onPageChange(num)}
@@ -41,7 +44,11 @@ const PageNationNum = ({
         width={21}
         height={21}
         src={arrowRightGray}
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={
+          currentPage === totalPages
+            ? () => {}
+            : () => onPageChange(currentPage + 1)
+        }
         style={{
           marginLeft: "10px",
           cursor: currentPage === totalPages ? "not-allowed" : "pointer",

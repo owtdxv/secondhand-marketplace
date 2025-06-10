@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -11,10 +12,14 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('product')
 export class ProductsController {
-  constructor(private productsService: ProductsService) {}
+  constructor(
+    private productsService: ProductsService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Get()
   async getAllProducts(
@@ -56,9 +61,22 @@ export class ProductsController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
   async getProductDetail(@Param('id') productId: string, @Req() req: any) {
-    return this.productsService.getProductById(productId, req.user.uid);
+    const authHeader = req.headers.authorization;
+    let uid: string = '';
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const payload: any = this.jwtService.verify(token);
+        uid = payload.uid;
+      } catch {
+        // 토큰이 잘못됐더라도 상세는 볼 수 있어야 하므로 uid = null 처리
+        uid = '';
+      }
+    }
+
+    return this.productsService.getProductById(productId, uid);
   }
 
   @Put('add-like/:id')
@@ -85,5 +103,24 @@ export class ProductsController {
   ) {
     const uid = req.user.uid;
     return this.productsService.updateProduct({ productId, body, uid });
+  }
+  @Put('update-status/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async updateStatus(
+    @Param('id') productId: string,
+    @Body('status') status: '판매중' | '판매완료',
+    @Req() req,
+  ) {
+    return this.productsService.updateProductStatus(
+      productId,
+      status,
+      req.user.uid,
+    );
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
+  async delete(@Param('id') productId: string, @Req() req) {
+    return this.productsService.deleteProduct(productId, req.user.uid);
   }
 }

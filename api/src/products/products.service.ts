@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Post,
   ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -320,7 +321,7 @@ export class ProductsService {
     }
 
     //로그인한 사용자의 판매상품인경우를 체크하는 변수
-    const isMine = product.sellerId.toString() === uid;
+    const isMine = uid ? product.sellerId.toString() === uid : false;
 
     //판메지의 정보를 가져와야하는데 이렇게 하는게 맞나?
     const seller: UserDocument = await this.userModel
@@ -339,38 +340,38 @@ export class ProductsService {
       }),
     ]);
 
-    // 좋아요 여부
-    const liked = await this.likedProductsModel.findOne({
-      uid,
-      productIds: product._id,
-    });
-
-    const isLiked = !!liked;
-
-    // viewedProducts에 추가
-    const viewedDoc = await this.viewedProductsModel.findOne({
-      uid: new Types.ObjectId(uid),
-    });
-
-    if (viewedDoc) {
-      // 이미 본 상품의 경우 해당 값을 제거하고
-      viewedDoc.productIds = viewedDoc.productIds.filter(
-        (id) => id.toString() !== productId,
-      );
-
-      // 배열 맨 앞에 추가
-      viewedDoc.productIds.unshift(product._id as Types.ObjectId);
-
-      await viewedDoc.save();
-    } else {
-      await this.viewedProductsModel.create({
-        uid: new Types.ObjectId(uid),
-        productIds: [product._id],
+    let isLiked = false;
+    let isUser = false;
+    // 로그인한 사용자의 경우 좋아요와, 최근 본 상품에 등록
+    if (uid) {
+      isUser = true;
+      const liked = await this.likedProductsModel.findOne({
+        uid,
+        productIds: product._id,
       });
+      isLiked = !!liked;
+
+      const viewedDoc = await this.viewedProductsModel.findOne({
+        uid: new Types.ObjectId(uid),
+      });
+
+      if (viewedDoc) {
+        viewedDoc.productIds = viewedDoc.productIds.filter(
+          (id) => id.toString() !== productId,
+        );
+        viewedDoc.productIds.unshift(product._id as Types.ObjectId);
+        await viewedDoc.save();
+      } else {
+        await this.viewedProductsModel.create({
+          uid: new Types.ObjectId(uid),
+          productIds: [product._id],
+        });
+      }
     }
 
     return {
       ...product,
+      isUser,
       isMine,
       isLiked,
       lastUpdated: this.getRelativeTime(new Date((product as any).updatedAt)),
@@ -599,5 +600,46 @@ export class ProductsService {
       statusCode: 200,
       message: '상품이 성공적으로 수정되었습니다.',
     };
+  }
+
+  // 판매상태 변경 (uid가 sellerId와 동일한지 체크후 상태 변경)
+  async updateProductStatus(
+    productId: string,
+    status: '판매중' | '판매완료',
+    uid: string,
+  ) {
+    const product = await this.productModel.findById(productId);
+    if (!product) {
+      throw new NotFoundException('상품을 찾을 수 없습니다.');
+    }
+
+    if (product.sellerId.toString() !== uid) {
+      throw new ForbiddenException('수정 권한이 없습니다.');
+    }
+
+    product.status = status;
+    await product.save();
+
+    return {
+      result: true,
+      message: '상품 상태가 변경되었습니다.',
+      status: status,
+    };
+  }
+
+  // 판매상품 삭제(uid와 sellerId가 동일한 경우만 삭제 가능)
+  async deleteProduct(productId: string, uid: string) {
+    const product = await this.productModel.findById(productId);
+    if (!product) {
+      throw new NotFoundException('상품을 찾을 수 없습니다.');
+    }
+
+    if (product.sellerId.toString() !== uid) {
+      throw new ForbiddenException('삭제 권한이 없습니다.');
+    }
+
+    await product.deleteOne();
+
+    return { result: true, message: '상품이 삭제되었습니다.' };
   }
 }
