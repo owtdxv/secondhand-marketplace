@@ -68,11 +68,24 @@ export class ProductsController {
     return this.productsService.toggleLike(productId, req.user.uid);
   }
 
+  //새 상품 추가
   @Post('new')
   @UseGuards(AuthGuard('jwt'))
   async createProduct(@Body() body: any, @Req() req: any) {
     const uid = req.user.uid;
     return this.productsService.createProduct({ body, uid });
+  }
+
+  //상품 수정
+  @Put('edit/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async updateProduct(
+    @Param('id') productId: string,
+    @Body() body: any,
+    @Req() req: any,
+  ) {
+    const uid = req.user.uid;
+    return this.productsService.updateProduct({ productId, body, uid });
   }
   @Put('update-status/:id')
   @UseGuards(AuthGuard('jwt'))

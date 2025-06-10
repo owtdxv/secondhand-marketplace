@@ -1,0 +1,158 @@
+.wrap {
+  width: 100%;
+}
+
+.myPage {
+  width: 1200px;
+  padding: 72px 40px;
+  display: flex;
+  margin: auto;
+}
+
+.side {
+  width: 175px;
+  height: 100%;
+  margin-right: 30px;
+}
+
+.myPageTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.sideList {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.content {
+  width: 100%;
+}
+
+.line {
+  width: 100%;
+  color: #d9d9d9;
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.wrapUserInfo {
+  display: flex;
+  justify-content: space-between;
+}
+
+.userInfoLeft {
+  display: flex;
+}
+
+.userInfo > input {
+  border: none;
+  border-bottom: 1px solid black;
+}
+
+.userInfo > input:focus {
+  outline: none;
+}
+
+.profile {
+  width: 87px;
+  height: 87px;
+  border-radius: 100%;
+  background-color: #d9d9d9;
+}
+
+.userInfo {
+  margin-left: 16px;
+}
+
+.nickName {
+  margin-top: 9px;
+  margin-bottom: 6px;
+
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.email {
+  font-size: 16px;
+  margin: 0;
+}
+
+.stateBox {
+  width: 585px;
+  height: 93px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wrapState {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  text-align: center;
+}
+
+.wrapState > p {
+  margin: 0;
+  color: #d9d9d9;
+  margin-bottom: 11px;
+}
+
+.verticalLine {
+  width: 1px;
+  height: 20px;
+  background-color: #d9d9d9;
+}
+
+/* MyProdcy css */
+
+.myProductWrap {
+  margin-top: 36px;
+}
+
+.product {
+  margin-top: 24px;
+}
+
+.redText {
+  color: #f15746;
+  font-size: 16px;
+}
+
+.filter {
+  margin-top: 17px;
+  margin-bottom: 17px;
+
+  display: flex;
+  color: #a4a4a4;
+  font-weight: 600;
+  align-items: center;
+  gap: 15px;
+  justify-content: end;
+}
+
+.verticalShort {
+  width: 1px;
+  height: 10px;
+  background-color: #a4a4a4;
+}
+
+.wrapItems {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 30px;
+  width: 100%;
+}

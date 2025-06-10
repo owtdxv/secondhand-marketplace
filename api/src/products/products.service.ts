@@ -560,6 +560,48 @@ export class ProductsService {
     };
   }
 
+  //상품 정보 수정
+  async updateProduct({
+    productId,
+    uid,
+    body,
+  }: {
+    productId: string;
+    uid: string;
+    body: any;
+  }) {
+    const product = await this.productModel.findById(productId);
+    if (!product) {
+      throw new NotFoundException('상품을 찾을 수 없습니다.');
+    }
+
+    if (product.sellerId.toString() !== uid) {
+      throw new ForbiddenException('수정 권한이 없습니다.');
+    }
+
+    const allowedFields = [
+      'name',
+      'price',
+      'category',
+      'saleRegion',
+      'description',
+      'images',
+    ];
+
+    for (const key of allowedFields) {
+      if (body[key] !== undefined) {
+        product[key] = body[key];
+      }
+    }
+
+    await product.save();
+
+    return {
+      statusCode: 200,
+      message: '상품이 성공적으로 수정되었습니다.',
+    };
+  }
+
   // 판매상태 변경 (uid가 sellerId와 동일한지 체크후 상태 변경)
   async updateProductStatus(
     productId: string,
