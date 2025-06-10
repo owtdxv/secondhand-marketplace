@@ -31,6 +31,63 @@ export class ProductsService {
   ) {}
 
   /**
+   * 사용자의 좋아요한 상품, 최근 검색어 등을 사용하여 추천 상품을 표시합니다(페이지네이션 없음)
+   * @param uid 사용자 uid
+   */
+  async getRecommendProduct(uid: string) {
+    const getLikedList = await this.likedProductsModel
+      .findOne({ uid: new Types.ObjectId(uid) })
+      .lean()
+      .exec();
+
+    const getViewedList = await this.viewedProductsModel
+      .findOne({ uid: new Types.ObjectId(uid) })
+      .lean()
+      .exec();
+
+    const likedIds = getLikedList?.productIds || [];
+    const viewedIds = getViewedList?.productIds || [];
+    const recentProductIds = [...likedIds, ...viewedIds];
+
+    if (recentProductIds.length === 0) {
+      // 없으면 랜덤 상품 표시
+      const randomProducts = await this.productModel.aggregate([
+        { $sample: { size: 6 } },
+      ]);
+
+      return randomProducts;
+    }
+
+    // 최근 본/좋아한 상품에서 카테고리 추출
+    const recentProducts = await this.productModel
+      .find({ _id: { $in: recentProductIds } })
+      .lean()
+      .exec();
+
+    const categories = [...new Set(recentProducts.map((p) => p.category))];
+    const saleRegions = [...new Set(recentProducts.map((p) => p.saleRegion))];
+
+    const recommended = await this.productModel
+      .find({
+        category: { $in: categories },
+        saleRegion: { $in: saleRegions },
+        status: '판매중',
+        _id: { $nin: recentProductIds }, // 본 것/좋아요 한 것은 제외
+      })
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean()
+      .exec();
+
+    const items = recommended.map((item) => ({
+      ...item,
+      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
+    }));
+
+    return items;
+  }
+
+  /**
    * 사용자가 "판매중"인 상품을 정렬 조건에 맞게 반환합니다
    * @param uid 사용자 uid
    * @param page 현재 페이지 번호
