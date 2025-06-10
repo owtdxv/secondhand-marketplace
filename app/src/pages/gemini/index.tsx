@@ -52,14 +52,14 @@ const GeminiContainer: React.FC<GeminiContainerProps> = ({ socket }) => {
       // 💡 AI 응답을 ChatMessage 객체 형태로 messages에 추가합니다.
       const aiMessage: ChatMessage = {
         type: "aiResponse",
-        content: data.message, // AI가 생성한 주요 응답 텍스트
-        productIds: data.retrievedProductIds, // 검색된 상품 ID 목록
-        highestLikedId: data.highestLikedProductId, // AI가 선택한 최고 좋아요 상품 ID
+        content: data.message,
+        productIds: data.retrievedProductIds,
+        relevantProductId: data.relevantProductId,
       };
-      if (aiMessage.productIds && aiMessage.productIds.length > 0) {
+      if (aiMessage.relevantProductId) {
         socket.emit("navigate", {
           uid: user._id,
-          productId: aiMessage.productIds[0],
+          productId: aiMessage.relevantProductId,
         });
       }
     };
@@ -104,7 +104,7 @@ const GeminiContainer: React.FC<GeminiContainerProps> = ({ socket }) => {
     setMessages(trimmedInput);
     if (socket && socket.connected && user && user._id) {
       // 상품데이터가 제대로 준비되면 사용하기
-      //socket.emit("sendAIMessage", { uid: user._id, query: trimmedInput }); // trimmedInput 사용
+      // socket.emit("sendAIMessage", { uid: user._id, query: trimmedInput }); // trimmedInput 사용
     }
     setInput(""); // 전송 후 입력 필드 초기화
   };

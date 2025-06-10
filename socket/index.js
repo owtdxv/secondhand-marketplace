@@ -91,12 +91,13 @@ async function populateVectorStore() {
     const products = await Product.find({}).lean();
 
     const docs = products.map((product) => ({
-      pageContent: `상품명: ${product.name}, 카테고리: ${product.category}, 설명: ${product.description}`,
+      pageContent: `상품명: ${product.name}, 카테고리: ${product.category}, 가격: ${product.price}원, 설명: ${product.description}`,
       metadata: {
         _id: product._id.toString(),
         name: product.name,
         category: product.category,
         likes: product.likes,
+        price: product.price,
       },
     }));
 
@@ -210,6 +211,7 @@ async function retrieveProductInfo(query) {
         category: doc.metadata.category,
         description: description,
         likes: doc.metadata.likes,
+        price: doc.metadata.price,
       };
     })
     .filter(Boolean);
@@ -277,31 +279,32 @@ io.on("connection", (socket) => {
       const productContext = retrievedProducts
         .map(
           (p) =>
-            `상품명: ${p.name}, 카테고리: ${p.category}, 설명: ${p.description}, 좋아요: ${p.likes}, _id: ${p._id}`
+            `상품명: ${p.name}, 카테고리: ${p.category}, 가격: ${p.price}원, 설명: ${p.description}, 좋아요: ${p.likes}, _id: ${p._id}`
         )
         .join("\n\n");
 
-      const prompt = `사용자가 상품 정보를 요청했습니다. 다음 상품 정보들을 참조하여 사용자의 질의에 가장 적합한 상품을 찾고, 그 중 좋아요 수가 가장 높은 상품의 _id를 정확히 알려주세요. 만약 여러 상품이 유사한데 좋아요 수가 동일하다면 그 상품들의 _id를 모두 알려주세요.
-    --- 상품 정보 ---
-    ${productContext}
-    ---
-    사용자 질의: "${query}"
-    
-    응답 형식:
-    질의와 관련된 상품 정보 요약.
-    가장 좋아요 수가 높은 상품의 _id: [찾은 _id]
-    `;
+      const prompt = `사용자가 상품 정보를 요청했습니다. 다음 상품 정보들을 참조하여 사용자의 질의와 가장 관련성이 높은 상품을 요약해서 알려주세요. 반드시 응답 마지막 줄에 "_id: [상품의 ID]" 형식으로 _id를 제공하세요. 형식을 반드시 지켜주세요.
+
+--- 상품 정보 ---
+${productContext}
+---
+사용자 질의: "${query}"
+
+응답 형식 예시:
+- 질의와 가장 관련 있는 상품 정보 요약
+- _id: 65e7dabc1234abcd5678efgh
+`;
 
       const result = await model.invoke(prompt);
       const responseText = result.content;
-
-      const idRegex = /가장 좋아요 수가 높은 상품의 _id: \[([^\]]+)\]/;
+      console.log("응답 정보: ", responseText);
+      const idRegex = /_id:\s*([a-f0-9]{24})/;
       const match = responseText.match(idRegex);
-      const highestLikedProductId = match ? match[1] : "찾을 수 없음";
+      const relevantProductId = match ? match[1] : "찾을 수 없음";
 
       console.log(
         "Gemini 응답에서 추출된 최고 좋아요 상품 ID:",
-        highestLikedProductId
+        relevantProductId
       );
 
       // ----------------------------------------------------
@@ -312,7 +315,7 @@ io.on("connection", (socket) => {
         // ✨ uid.toString() 대신 socket.emit 사용
         message: responseText, // AI가 생성한 전체 응답 텍스트
         retrievedProductIds: productIds, // 검색된 3개의 상품 ID 목록
-        highestLikedProductId: highestLikedProductId, // AI가 선택한 최고 좋아요 상품 ID
+        relevantProductId: relevantProductId,
       });
     } catch (error) {
       console.error("Error processing product query: ", error);
@@ -379,7 +382,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// ... (나머지 서버 코드 생략) ...
 server.listen(PORT, () => {
   console.log(`서버 실행(${PORT})`);
 });
