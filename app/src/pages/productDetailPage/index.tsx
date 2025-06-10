@@ -50,7 +50,6 @@ const ProductDetailPageContainer = () => {
       })
       .then((res) => {
         setProduct(res.data);
-        console.log(res.data);
       })
       .catch((err) => {
         console.error("상품 조회 실패", err);
@@ -60,13 +59,17 @@ const ProductDetailPageContainer = () => {
   if (!product) return <div>Loading...</div>;
 
   const onImageChange = (imageNum: number) => {
-    console.log("이미지 배열", product.images);
-    console.log("현재 이미지 인덱스", imageNum);
     setCurrentImageNum(imageNum);
   };
 
+  // 로그인 안한 유저인 경우에는 alert로 로그인이 필요함
+  // 로그인 한 유저인 경우 상품 좋아요 처리
   const onLikeToggle = async () => {
     if (!product || !productId) return;
+    if (!product.isUser) {
+      alert("로그인이 필요한 서비스입니다.");
+      return;
+    }
     const token = sessionStorage.getItem("token");
     try {
       await axios.put(`/api/product/add-like/${productId}`, null, {

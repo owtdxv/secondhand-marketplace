@@ -3,7 +3,6 @@ import Footer from "../../components/Footer";
 import { ProductInfo } from "../../types/product";
 import Product from "../../components/product/Product";
 import PageNationNum from "../../components/pageNation/PageNationNum";
-import { Link } from "react-router-dom";
 
 interface PropsType {
   products: ProductInfo[];
@@ -51,11 +50,10 @@ const ProductListPage = ({
           </div>
           <div className={styles.wrapProducts}>
             {products.map((item: ProductInfo) => (
-              <Link to={`/products/${item._id}`} className={styles.link}>
-                <Product key={item._id} data={item} />
-              </Link>
+              <Product key={item._id} data={item} />
             ))}
           </div>
+          s
           <PageNationNum
             totalPages={totalPage}
             currentPage={currentPage}

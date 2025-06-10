@@ -17,6 +17,7 @@ export interface ProductDetailInfo {
   category: string;
   description: string;
   images: string[];
+  isUser: boolean;
   isLiked: boolean;
   isMine: boolean;
   lastUpdated: string;

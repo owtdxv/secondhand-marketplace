@@ -12,10 +12,14 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('product')
 export class ProductsController {
-  constructor(private productsService: ProductsService) {}
+  constructor(
+    private productsService: ProductsService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Get()
   async getAllProducts(
@@ -57,9 +61,22 @@ export class ProductsController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
   async getProductDetail(@Param('id') productId: string, @Req() req: any) {
-    return this.productsService.getProductById(productId, req.user.uid);
+    const authHeader = req.headers.authorization;
+    let uid: string = '';
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const payload: any = this.jwtService.verify(token);
+        uid = payload.uid;
+      } catch {
+        // 토큰이 잘못됐더라도 상세는 볼 수 있어야 하므로 uid = null 처리
+        uid = '';
+      }
+    }
+
+    return this.productsService.getProductById(productId, uid);
   }
 
   @Put('add-like/:id')
