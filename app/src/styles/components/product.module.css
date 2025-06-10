@@ -1,3 +1,8 @@
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .image {
   width: 100%;
   height: 100%;
@@ -15,6 +20,14 @@
   height: 175px;
   border-radius: 8px;
   background-color: #d9d9d9;
+}
+
+/* 김효진 추가함 */
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .title {

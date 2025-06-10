@@ -101,8 +101,9 @@ export const GlobalSocketManager = () => {
   }, [isChatWidgetOpen]);
 
   useEffect(() => {
+    const socket_server_uri = import.meta.env.VITE_SOCKET_SERVER_URI;
     if (isLogin && user && !socketRef.current) {
-      socketRef.current = io("http://localhost:8000");
+      socketRef.current = io(socket_server_uri);
 
       socketRef.current.on("connect", () => {
         console.log("전역 소켓 연결됨");

@@ -19,3 +19,28 @@ export interface createProduct {
   price?: number;
   description?: string;
 }
+export interface ProductDetailInfo {
+  _id: string;
+  category: string;
+  description: string;
+  images: string[];
+  isUser: boolean;
+  isLiked: boolean;
+  isMine: boolean;
+  lastUpdated: string;
+  likes: number;
+  views: number;
+  name: string;
+  price: number;
+  saleRegion: string;
+  seller: SellerInfo;
+  sellerId: string;
+  status: string;
+}
+
+export interface SellerInfo {
+  displayName: string;
+  onSaleCount: number;
+  profileImage: string;
+  soldOutCount: number;
+}
