@@ -2,28 +2,80 @@ import styles from "@/styles/pages/addProduct.module.css";
 import Input from "../../components/inputs/Input";
 import LocationModal from "../../components/modal/LocationModal";
 
+import cameraIcon from "@/assets/icon/camera.png";
+import XButton from "@/assets/icon/X.png";
+import { createProduct } from "../../types/product";
+
 interface PropsType {
   modal: boolean;
   region: string;
+  data: createProduct;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  imagesFiles: File[];
   setRegion: (region: string) => void;
   modalHandler: () => void;
   onChangeValue: (e: any) => void;
+  removeImage: (targetFile: File) => void;
   createProduct: () => void;
+  handleCameraClick: () => void;
+  handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const AddProduct = ({
   modal,
   region,
+  data,
+  fileInputRef,
+  imagesFiles,
   setRegion,
   modalHandler,
   onChangeValue,
+  removeImage,
   createProduct,
+  handleCameraClick,
+  handleImageChange,
 }: PropsType) => {
   return (
     <div className={styles.wrap}>
       <div className={styles.addProduct}>
         <div className={styles.photos}>
-          <div className={styles.photo}></div>
+          <div onClick={handleCameraClick} className={styles.photo}>
+            <div>
+              <img width={26} height={26} src={cameraIcon} />
+              <div className={styles.count}>{data.images?.length}/2</div>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              style={{ display: "none" }}
+            />
+          </div>
+          {imagesFiles &&
+            imagesFiles.map((item) => {
+              const previewUrl = URL.createObjectURL(item);
+
+              return (
+                <div
+                  style={{
+                    backgroundImage: `url(${previewUrl})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                  className={styles.IsPhoto}
+                >
+                  <div>
+                    <div
+                      onClick={() => removeImage(item)}
+                      className={styles.delete}
+                    >
+                      <img width={13} height={13} src={XButton} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
         </div>
         <Input
           name="name"

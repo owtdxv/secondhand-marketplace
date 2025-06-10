@@ -18,6 +18,7 @@ export interface createProduct {
   saleRegion?: string;
   price?: number;
   description?: string;
+  images?: string[];
 }
 export interface ProductDetailInfo {
   _id: string;

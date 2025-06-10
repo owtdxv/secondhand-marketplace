@@ -1,15 +1,44 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import AddProduct from "./AddProduct";
 import { createProduct } from "../../types/product";
 import axios from "axios";
+import { app } from "../../firebase/firebase";
+import { getDownloadURL, uploadBytes, ref, getStorage } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 
 const AddProductContainer = () => {
   const [modal, setModal] = useState<boolean>(false);
   const [data, setData] = useState<createProduct>({
     price: 0,
+    images: [],
   });
+  const [imagesFiles, setImagesFiles] = useState<File[]>([]);
   const [region, setRegion] = useState<string>("지역 선택");
   const token = sessionStorage.getItem("token");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const storage = getStorage(app);
+  const navigate = useNavigate();
+
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
+  };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    e.target.value = "";
+
+    if (imagesFiles.length >= 2) {
+      alert("이미지는 최대 2개까지 등록 가능합니다.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagesFiles((prev) => [...prev, file]);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const onChangeValue = (e: any) => {
     setData({
@@ -18,30 +47,61 @@ const AddProductContainer = () => {
     });
   };
 
-  const createProduct = () => {
-    const postData = {
-      ...data,
-      price: Number(data.price),
-      saleRegion: region,
-      images: [
-        "https://image.msscdn.net/thumbnails/images/goods_img/20250408/5002420/5002420_17477061031169_big.png?w=1200",
-      ],
-    };
+  const removeImage = (targetFile: File) => {
+    setImagesFiles((prev) => prev.filter((file) => file !== targetFile));
+  };
 
-    console.log(postData);
-
-    axios
-      .post("/api/product/new", postData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
+  //여러개 파일 firebase에 업로드 해주는 코드
+  const uploadFileAndGetUrls = async (files: File[]) => {
+    try {
+      //단일로 진행 시 map 부분 제외하고 코딩 const storageRef ... 부터 작성하면 됨
+      const uploadPromises = files.map(async (file) => {
+        const fileName = `${Date.now()}_${file.name}`;
+        const storageRef = ref(storage, `productImages/${fileName}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        return url;
       });
+
+      const urls = await Promise.all(uploadPromises);
+      return urls;
+    } catch (error) {
+      console.error("파일 업로드 실패:", error);
+      throw error;
+    }
+  };
+
+  const createProduct = async () => {
+    try {
+      //firebase에 파일 업로드
+      const urls = await uploadFileAndGetUrls(imagesFiles);
+      console.log("업로드 된 URL:", urls);
+
+      const postData = {
+        ...data,
+        images: urls,
+        saleRegion: region,
+        price: Number(data.price),
+      };
+
+      console.log(postData);
+
+      // await axios
+      //   .post("/api/product/new", postData, {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   })
+      //   .then((res) => {
+      //     console.log(res);
+      //     navigate("/");
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
+    } catch (err) {
+      console.error("상품 등록 실패:", err);
+    }
   };
 
   const modalHandler = () => {
@@ -51,10 +111,16 @@ const AddProductContainer = () => {
     <AddProduct
       modal={modal}
       region={region}
+      data={data}
+      fileInputRef={fileInputRef}
+      imagesFiles={imagesFiles}
       setRegion={setRegion}
       modalHandler={modalHandler}
       onChangeValue={onChangeValue}
       createProduct={createProduct}
+      removeImage={removeImage}
+      handleCameraClick={handleCameraClick}
+      handleImageChange={handleImageChange}
     />
   );
 };
