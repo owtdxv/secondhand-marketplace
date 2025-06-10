@@ -48,6 +48,10 @@ io.on("connection", (socket) => {
 
   socket.on("joinRoom", async ({ chatRoomId }) => {
     socket.join(chatRoomId);
+    await ChatRoom.updateOne(
+      { _id: chatRoomId },
+      { $set: { isNewChatRoom: false } }
+    );
     console.log(`${socket.id} joined room ${chatRoomId}`);
   });
 

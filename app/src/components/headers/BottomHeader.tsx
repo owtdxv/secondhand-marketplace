@@ -23,7 +23,6 @@ const toggleChatUI = () => {
     return;
   }
 
-  // 열 때 chatRoot 없으면 생성
   if (!chatRoot) {
     chatRoot = createRoot(chatContainer);
   }

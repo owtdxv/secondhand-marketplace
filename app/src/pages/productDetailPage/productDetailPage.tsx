@@ -20,6 +20,7 @@ interface PropsType {
   toggleStatusMenu: () => void;
   onChangeStatus: (newStatus: "판매중" | "판매완료") => void;
   onClickDelete: () => void;
+  onClickChat: () => void;
 }
 const ProductDetailPage = ({
   product,
@@ -31,6 +32,7 @@ const ProductDetailPage = ({
   toggleStatusMenu,
   onChangeStatus,
   onClickDelete,
+  onClickChat,
 }: PropsType) => {
   return (
     <div className={styles.wrap}>
@@ -196,7 +198,9 @@ const ProductDetailPage = ({
                   </div>
                 </div>
               ) : (
-                <div className={styles.chatButton}>채팅하기</div>
+                <div className={styles.chatButton} onClick={onClickChat}>
+                  채팅하기
+                </div>
               )}
             </div>
           </div>

@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
@@ -78,6 +83,7 @@ export class ChatService {
           otherUser,
           createdAt: room.createdAt,
           updatedAt: room.updatedAt,
+          isNewChatRoom: room.isNewChatRoom,
           lastMessage: lastMessage || null,
         };
       }),
@@ -98,5 +104,34 @@ export class ChatService {
       .sort({ sentAt: 1 });
 
     return messages;
+  }
+
+  /**
+   * roomId를 사용하여 해당 채팅방의 정보를 가져옵니다
+   * @param roomId
+   * @param uid
+   * @returns
+   */
+  async getChatRoomInfoByRoomId(roomId: string, uid: string) {
+    const chatRoomInfo = await this.chatRoomModel
+      .findById(roomId)
+      .populate('participants', 'displayName profileImage')
+      .lean<ChatRoomDocument>();
+    if (!chatRoomInfo) {
+      throw new NotFoundException('채팅방을 찾을 수 없습니다.');
+    }
+    const isParticipant = chatRoomInfo.participants.some(
+      (participant: {
+        _id: Types.ObjectId | string;
+        displayName?: string;
+        profileImage?: string;
+      }) => participant._id.toString() === uid,
+    );
+
+    if (!isParticipant) {
+      throw new ForbiddenException('해당 채팅방에 접근할 권한이 없습니다.');
+    }
+
+    return chatRoomInfo;
   }
 }
