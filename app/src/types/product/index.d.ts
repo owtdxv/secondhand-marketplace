@@ -15,7 +15,7 @@ export interface getProductResponse {
 export interface createProduct {
   name?: string;
   category?: string;
-  region?: string;
+  saleRegion?: string;
   price?: number;
   description?: string;
 }

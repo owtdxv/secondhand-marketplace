@@ -57,7 +57,7 @@ const AddProduct = ({
           </div>
           <div className={styles.locationSelectWrap}>
             <select
-              name="region"
+              name="saleRegion"
               onClick={modalHandler}
               required
               className={`${styles.select} ${
@@ -75,7 +75,7 @@ const AddProduct = ({
         <Input
           name="price"
           onChange={onChangeValue}
-          type="text"
+          type="number"
           placeholder="₩ 상품의 가격을 입력해주세요"
           width="850px"
         />
