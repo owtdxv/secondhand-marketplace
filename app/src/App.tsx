@@ -11,6 +11,7 @@ import AddProductContainer from "./pages/addProduct";
 import MyPageContainer from "./pages/myPage";
 import ProductDetailPageContainer from "./pages/productDetailPage";
 import SearchProductContainer from "./pages/searchProductPage";
+import UpdateProductContainer from "./pages/updateProduct";
 
 function App() {
   return (
@@ -25,6 +26,10 @@ function App() {
         <Route path="/signup-complete" element={<SignupComplete />} />
         <Route path="/products" element={<ProductListContainer />} />
         <Route path="/add-product" element={<AddProductContainer />} />
+        <Route
+          path="/update-product/:productId"
+          element={<UpdateProductContainer />}
+        />
         <Route path="/mypage" element={<MyPageContainer />} />
         <Route
           path="/products/:productId"

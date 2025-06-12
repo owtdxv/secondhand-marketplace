@@ -1,12 +1,12 @@
-import { useRef, useState } from "react";
-import AddProduct from "./AddProduct";
+import { useEffect, useRef, useState } from "react";
+import AddProduct from "../addProduct/AddProduct";
 import { createProduct } from "../../types/product";
 import axios from "axios";
 import { app } from "../../firebase/firebase";
 import { getDownloadURL, uploadBytes, ref, getStorage } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const AddProductContainer = () => {
+const UpdateProductContainer = () => {
   const [modal, setModal] = useState<boolean>(false);
   const [data, setData] = useState<createProduct>({
     images: [],
@@ -17,10 +17,25 @@ const AddProductContainer = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const storage = getStorage(app);
   const navigate = useNavigate();
+  const { productId } = useParams();
+
+  useEffect(() => {
+    axios
+      .get(`/api/product/${productId}`)
+      .then((res) => {
+        console.log(res.data);
+        setData(res.data);
+        setRegion(res.data.saleRegion);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const handleCameraClick = () => {
     fileInputRef.current?.click();
   };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -46,8 +61,15 @@ const AddProductContainer = () => {
     });
   };
 
-  const removeImage = (targetFile: File | string) => {
-    setImagesFiles((prev) => prev.filter((file) => file !== targetFile));
+  const removeImage = (target: File | string) => {
+    if (typeof target === "string") {
+      setData((prev) => ({
+        ...prev,
+        images: (prev.images || []).filter((img) => img !== target),
+      }));
+    } else {
+      setImagesFiles((prev) => prev.filter((file) => file !== target));
+    }
   };
 
   //여러개 파일 firebase에 업로드 해주는 코드
@@ -70,7 +92,7 @@ const AddProductContainer = () => {
     }
   };
 
-  const createProduct = async () => {
+  const updateProduct = async () => {
     try {
       //firebase에 파일 업로드
       const urls = await uploadFileAndGetUrls(imagesFiles);
@@ -106,18 +128,21 @@ const AddProductContainer = () => {
   const modalHandler = () => {
     setModal(!modal);
   };
+  if (!data) {
+    return <div>상품을 가져오는 중....</div>;
+  }
   return (
     <AddProduct
       modal={modal}
       region={region}
       data={data}
-      mode="new"
+      mode="edit"
       fileInputRef={fileInputRef}
       imagesFiles={imagesFiles}
       setRegion={setRegion}
       modalHandler={modalHandler}
       onChangeValue={onChangeValue}
-      onClickSubmit={createProduct}
+      onClickSubmit={updateProduct}
       removeImage={removeImage}
       handleCameraClick={handleCameraClick}
       handleImageChange={handleImageChange}
@@ -125,4 +150,4 @@ const AddProductContainer = () => {
   );
 };
 
-export default AddProductContainer;
+export default UpdateProductContainer;

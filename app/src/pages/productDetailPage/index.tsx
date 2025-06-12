@@ -105,6 +105,10 @@ const ProductDetailPageContainer = () => {
     }
   };
 
+  const onClickEditMode = () => {
+    navigate(`/update-product/${productId}`);
+  };
+
   return (
     <ProductDetailPage
       product={product}
@@ -116,6 +120,7 @@ const ProductDetailPageContainer = () => {
       toggleStatusMenu={toggleStatusMenu}
       onChangeStatus={onChangeStatus}
       onClickDelete={onClickDelete}
+      onClickEditMode={onClickEditMode}
     />
   );
 };
