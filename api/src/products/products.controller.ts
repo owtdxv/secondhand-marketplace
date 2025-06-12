@@ -2,12 +2,14 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Post,
   Put,
   Query,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
@@ -189,5 +191,15 @@ export class ProductsController {
   @UseGuards(AuthGuard('jwt'))
   async delete(@Param('id') productId: string, @Req() req) {
     return this.productsService.deleteProduct(productId, req.user.uid);
+  }
+
+  // 추천 상품 조회
+  @Get('recommend/:uid')
+  @UseGuards(AuthGuard('jwt'))
+  async getRecommendProduct(@Param('uid') uid: string, @Req() req) {
+    if (uid != req.user.uid) {
+      throw new ForbiddenException();
+    }
+    return this.productsService.getRecommendProduct(uid);
   }
 }

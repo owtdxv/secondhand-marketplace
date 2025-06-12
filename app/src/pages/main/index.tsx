@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import Main from "./Main";
 import axios from "axios";
-import { getProductResponse } from "../../types/product";
+import {
+  getProductResponse,
+  getRecommendProductResponse,
+} from "../../types/product";
+import { User } from "../../types/user";
 
 const MainContainer = () => {
   const [recentData, setRecentData] = useState<getProductResponse>({
@@ -19,6 +23,12 @@ const MainContainer = () => {
     totalPages: 1,
     items: [],
   });
+  const [recommendData, setRecommendData] =
+    useState<getRecommendProductResponse>({
+      items: [],
+    });
+  const [user, setUser] = useState<User | null>(null);
+
   const [recentPage, setRecentPage] = useState(1);
   const [topViewPage, setTopViewPage] = useState(1);
   const [topLikePage, setTopLikePage] = useState(1);
@@ -63,6 +73,42 @@ const MainContainer = () => {
         console.log(err);
       });
   }, [recentPage, topLikePage, topViewPage]);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      axios
+        .get("/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setUser(res.data);
+        })
+        .catch((err) => {
+          console.log("사용자 정보 가져오기 실패: ", err);
+        });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const token = sessionStorage.getItem("token");
+    axios
+      .get(`/api/product/recommend/${user._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setRecommendData({ items: res.data });
+      })
+      .catch((err) => {
+        console.log("추천 상품 가져오기 실패: ", err);
+      });
+  }, [user]);
   return (
     <Main
       recentData={recentData}
@@ -71,6 +117,8 @@ const MainContainer = () => {
       onTopViewPageChange={onTopViewPageChange}
       onRecentPageChange={onRecentPageChange}
       onTopLikePageChange={onTopLikePageChange}
+      user={user}
+      recommendData={recommendData}
     />
   );
 };

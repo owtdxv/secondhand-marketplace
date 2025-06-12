@@ -12,6 +12,15 @@ interface ChatRoomListProps {
 
 const ChatRoomList: React.FC<ChatRoomListProps> = ({ user, chatRooms }) => {
   const navigate = useNavigate();
+  useEffect(() => {
+    const latestRoom = chatRooms.find((room) => room.isNewChatRoom);
+
+    if (latestRoom) {
+      navigate(`/room/${latestRoom._id}`, {
+        state: { chatRoomData: latestRoom },
+      });
+    }
+  }, [chatRooms, navigate]);
   return (
     <div>
       <div></div>
