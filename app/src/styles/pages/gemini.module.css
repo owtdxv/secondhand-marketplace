@@ -1,0 +1,164 @@
+.chatContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 550px;
+}
+
+.chatBox {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  height: 50px;
+}
+
+.input {
+  flex: 1;
+  height: 44px;
+  padding: 0 16px;
+  font-size: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 9999px; /* 완전한 pill 형태 */
+  outline: none;
+  color: #333;
+}
+
+.input::placeholder {
+  color: #ccc;
+}
+
+.chatContainer {
+  width: 100%;
+  height: 530px;
+  flex-grow: 1; /* 추가: 부모 요소가 flex일 때 남은 공간을 채우도록 */
+  display: flex; /* 추가: 내부 요소를 정렬하기 위해 */
+  flex-direction: column; /* 추가: chatBox와 inputContainer를 세로로 배치 */
+}
+
+.chatBox {
+  flex-grow: 1; /* 메시지 영역이 가능한 많은 공간을 차지하도록 */
+  overflow-y: auto; /* 메시지가 많을 경우 스크롤 */
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* 메시지 행(row) 사이의 간격 */
+}
+
+.messageRow {
+  display: flex;
+  width: 100%;
+  margin-bottom: 8px;
+  align-items: flex-start; /* 프로필 이미지와 메시지 내용을 상단 기준으로 정렬 */
+}
+
+.dateSeparator {
+  text-align: center;
+  margin-top: 20px; /* 이전 메시지 그룹과의 상단 여백 */
+  margin-bottom: 15px; /* 다음 메시지와의 하단 여백 */
+  color: #a4a4a4; /* 날짜 텍스트 색상 (iOS 스타일 참고) */
+  font-size: 0.9rem; /* 글꼴 크기 */
+  font-weight: 300;
+  width: 100%; /* 전체 너비 차지 */
+}
+
+/* 현재 사용자(나)의 메시지 행 스타일 */
+.currentUserRow {
+  justify-content: flex-end; /* 내용을 오른쪽으로 정렬 */
+}
+.currentUserRow .messageContentArea {
+  /* 내 메시지는 닉네임이 없으므로, 컨텐츠 영역 정렬 조정 */
+  align-items: flex-end;
+}
+
+/* 상대방 메시지 행 스타일 */
+.otherUserRow {
+  justify-content: flex-start; /* 내용을 왼쪽으로 정렬 */
+}
+.otherUserRow .messageContentArea {
+  align-items: flex-start;
+}
+
+.messageProfilePic {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 12px;
+  flex-shrink: 0; /* 이미지가 줄어들지 않도록 */
+}
+
+.messageContentArea {
+  display: flex;
+  flex-direction: column;
+  max-width: 75%; /* 메시지 영역의 최대 너비 제한 */
+}
+
+.messageSenderNickname {
+  font-size: 0.75em;
+  color: #000;
+  font-weight: bold;
+  margin-bottom: 6px;
+  /* 상대방 메시지 닉네임은 왼쪽에 붙도록 */
+  /* .otherUserRow & { margin-left: 0; } */ /* 이미 messageContentArea가 flex-start로 정렬 중 */
+}
+
+.bubbleAndTimeWrapper {
+  display: flex;
+  align-items: flex-end; /* 말풍선과 시간을 하단 기준으로 정렬 */
+  gap: 10px; /* 말풍선과 시간 사이의 간격 */
+}
+
+/* 내 메시지의 bubbleAndTimeWrapper (시간이 먼저 나오므로) */
+.currentUserRow .bubbleAndTimeWrapper {
+  /* 특별한 정렬 변경 없음, HTML 순서대로 배치됨 */
+}
+
+/* 상대방 메시지의 bubbleAndTimeWrapper (말풍선이 먼저 나오므로) */
+.otherUserRow .bubbleAndTimeWrapper {
+  /* 특별한 정렬 변경 없음, HTML 순서대로 배치됨 */
+}
+
+.messageBubble {
+  padding: 10px 14px;
+  border-radius: 10px;
+  word-wrap: break-word; /* 긴 단어 자동 줄바꿈 */
+  /* max-width는 messageContentArea에서 제어 */
+}
+
+.messageBubble p {
+  margin: 0;
+  padding: 0;
+  font-size: 0.8em;
+  line-height: 1.4;
+  font-weight: 300;
+}
+
+.currentUserBubble {
+  background-color: #61a872; /* 사용자 이미지의 초록색 계열 */
+  color: #ffffff;
+}
+
+.otherUserBubble {
+  background-color: #ebebeb; /* 사용자 이미지의 흰색 */
+  color: #121212;
+}
+
+.messageTimestamp {
+  font-size: 0.7em; /* 글자 크기 줄임 */
+  color: #d9d9d9; /* 회색 계열로 변경 */
+  white-space: nowrap; /* 시간이 줄바꿈되지 않도록 */
+  padding-bottom: 2px; /* 말풍선 하단과 정렬을 맞추기 위한 약간의 패딩 */
+}
+
+/* .myMessageTimestamp, .otherMessageTimestamp 에 특별한 스타일이 더 필요하다면 여기에 추가 */
+
+/* ... (기존 inputContainer, input, attachIcon 등 스타일) ... */

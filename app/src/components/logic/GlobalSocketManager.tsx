@@ -106,7 +106,7 @@ export const GlobalSocketManager = () => {
       socketRef.current = io(socket_server_uri);
 
       socketRef.current.on("connect", () => {
-        console.log("전역 소켓 연결됨");
+        console.log("전역 소켓 연결됨: ", user._id);
         socketRef.current?.emit("joinUser", { uid: user._id });
       });
 
@@ -114,6 +114,10 @@ export const GlobalSocketManager = () => {
         if (!isChatWidgetOpenRef.current) {
           toggleNotificationUI(newMessage);
         }
+      });
+
+      socketRef.current.on("navigate", (productId: string) => {
+        window.location.href = `/products/${productId}`;
       });
     }
 

@@ -5,6 +5,7 @@ export interface ChatRoomInfo {
     displayName: string;
     profileImage: string;
   };
+  isNewChatRoom: boolean;
   createdAt: string;
   updatedAt: string;
   lastMessage: {
