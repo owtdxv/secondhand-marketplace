@@ -74,6 +74,7 @@ const AddProductContainer = () => {
     try {
       //firebase에 파일 업로드
       const urls = await uploadFileAndGetUrls(imagesFiles);
+      const BASE_URL = import.meta.env.VITE_SOCKET_SERVER_URI;
       console.log("업로드 된 URL:", urls);
 
       const postData = {
@@ -91,9 +92,30 @@ const AddProductContainer = () => {
             Authorization: `Bearer ${token}`,
           },
         })
-        .then((res) => {
-          console.log(res);
-          navigate("/");
+        .then(async (res) => {
+          console.log("상품 등록 응답:", res.data);
+
+          const productId = res.data._id;
+
+          // 상품 벡터화 API 호출
+          await axios
+            .post(
+              `${BASE_URL}/api/vectorize`,
+              { _id: productId },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            )
+            .then((vectorRes) => {
+              console.log("벡터화 성공:", vectorRes.data);
+              navigate("/"); // 모든 작업 완료 후 이동
+            })
+            .catch((err) => {
+              console.error("벡터화 실패:", err);
+              // navigate는 필요 시 여기서도 호출 가능
+            });
         })
         .catch((err) => {
           console.log(err);

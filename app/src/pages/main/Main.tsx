@@ -4,7 +4,12 @@ import Product from "../../components/product/Product";
 import styles from "@/styles/pages/main.module.css";
 
 import arrowRightGray from "@/assets/icon/arrowRightGray.png";
-import { getProductResponse, ProductInfo } from "../../types/product";
+import {
+  getProductResponse,
+  getRecommendProductResponse,
+  ProductInfo,
+} from "../../types/product";
+import { User } from "../../types/user";
 4;
 interface PropsType {
   recentData: getProductResponse;
@@ -13,6 +18,8 @@ interface PropsType {
   onTopViewPageChange: (page: number) => void;
   onRecentPageChange: (page: number) => void;
   onTopLikePageChange: (page: number) => void;
+  user: User | null;
+  recommendData: getRecommendProductResponse;
 }
 
 const Main = ({
@@ -22,6 +29,8 @@ const Main = ({
   onTopViewPageChange,
   onRecentPageChange,
   onTopLikePageChange,
+  user,
+  recommendData,
 }: PropsType) => {
   return (
     <div className={styles.wrap}>
@@ -106,6 +115,25 @@ const Main = ({
             onPageChange={onTopViewPageChange}
           />
         </div>
+        {user && (
+          <div className={styles.productsWrap} style={{ marginTop: "50px" }}>
+            <div className={styles.top}>
+              <div style={{ display: "flex" }}>
+                <div className={styles.title}>
+                  {user?.displayName} 님을 위한 추천 상품
+                </div>
+                <div className={styles.subTitle}>
+                  최근 본 상품, 좋아요한 상품을 기반으로 추천 상품을 표시합니다
+                </div>
+              </div>
+            </div>
+            <div className={styles.wrapProducts}>
+              {recentData?.items.map((item: ProductInfo) => (
+                <Product data={item} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       <Footer />
     </div>

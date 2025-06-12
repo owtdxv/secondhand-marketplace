@@ -12,9 +12,13 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@langchain/google-genai": "^0.2.10",
+    "@langchain/mongodb": "^0.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "langchain": "^0.3.27",
     "mongoose": "^8.15.1",
     "socket.io": "^4.8.1"
   },
