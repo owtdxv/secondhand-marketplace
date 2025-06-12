@@ -65,6 +65,7 @@ const ProductDetailPageContainer = () => {
           window.dispatchEvent(new Event("openChatWidgetRequest"));
         });
     } catch (err) {
+      alert("해당 사용자와 채팅할 수 없습니다!");
       console.error("채팅방 생성 오류", err);
     }
   };

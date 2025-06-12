@@ -40,6 +40,10 @@ export class ChatService {
       throw new BadRequestException('participants는 정확히 2명이어야 합니다.');
     }
 
+    if (participants[0] === participants[1]) {
+      throw new BadRequestException('참여자 ID는 서로 달라야 합니다.');
+    }
+
     // 참가자 ID를 ObjectId로 변환하고 오름차순으로 정렬하여 일관성을 유지합니다.
     const objectIds = participants.map((id) => new Types.ObjectId(id));
     objectIds.sort(); // 오름차순 정렬

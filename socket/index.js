@@ -16,9 +16,10 @@ const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
 
 const app = express();
 const server = http.createServer(app);
+const NGROK_URL = process.env.NGROK_URL;
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://127.0.0.1:5500"], // 반드시 지정해야 함
+    origin: ["http://localhost:5173", "http://127.0.0.1:5500", NGROK_URL], // 반드시 지정해야 함
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -29,7 +30,7 @@ const PORT = 8000;
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5500"],
+    origin: ["http://localhost:5173", "http://127.0.0.1:5500", NGROK_URL],
     credentials: true,
   })
 );
