@@ -12,6 +12,14 @@ export interface getProductResponse {
   totalPages: number;
 }
 
+export interface createProduct {
+  name?: string;
+  category?: string;
+  saleRegion?: string;
+  price?: number;
+  description?: string;
+  images?: string[];
+}
 export interface ProductDetailInfo {
   _id: string;
   category: string;
