@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AddProduct from "../addProduct/AddProduct";
 import { createProduct } from "../../types/product";
 import axios from "axios";
@@ -24,13 +24,22 @@ const UpdateProductContainer = () => {
       .get(`/api/product/${productId}`)
       .then((res) => {
         console.log(res.data);
-        setData(res.data);
+        setData(normalize(res.data));
         setRegion(res.data.saleRegion);
       })
       .catch((err) => {
         console.log(err);
       });
   }, []);
+
+  const normalize = (raw: any): createProduct => ({
+    name: raw.name,
+    category: raw.category,
+    saleRegion: raw.saleRegion,
+    price: raw.price,
+    description: raw.description,
+    images: raw.images || [],
+  });
 
   const handleCameraClick = () => {
     fileInputRef.current?.click();
@@ -98,9 +107,9 @@ const UpdateProductContainer = () => {
       const urls = await uploadFileAndGetUrls(imagesFiles);
       console.log("업로드 된 URL:", urls);
 
-      const postData = {
+      const postData: createProduct = {
         ...data,
-        images: urls,
+        images: [...(data.images || []), ...urls],
         saleRegion: region,
         price: Number(data.price),
       };
@@ -108,26 +117,36 @@ const UpdateProductContainer = () => {
       console.log(postData);
 
       await axios
-        .post("/api/product/new", postData, {
+        .put(`/api/product/edit/${productId}`, postData, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
         .then((res) => {
           console.log(res);
-          navigate("/");
+          alert("상품 수정이 완료되었습니다.");
+          navigate(`/products/${productId}`);
         })
         .catch((err) => {
           console.log(err);
+          alert("상품 수정에 실패했습니다.");
         });
     } catch (err) {
-      console.error("상품 등록 실패:", err);
+      console.error("상품 수정 실패:", err);
     }
   };
 
   const modalHandler = () => {
     setModal(!modal);
   };
+
+  const imagePreview = useMemo(() => {
+    return imagesFiles.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+  }, [imagesFiles]);
+
   if (!data) {
     return <div>상품을 가져오는 중....</div>;
   }
@@ -139,6 +158,7 @@ const UpdateProductContainer = () => {
       mode="edit"
       fileInputRef={fileInputRef}
       imagesFiles={imagesFiles}
+      imagePreview={imagePreview}
       setRegion={setRegion}
       modalHandler={modalHandler}
       onChangeValue={onChangeValue}

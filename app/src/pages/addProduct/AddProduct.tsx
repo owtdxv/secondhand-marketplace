@@ -13,6 +13,7 @@ interface PropsType {
   mode: string;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   imagesFiles: File[];
+  imagePreview: { file: File; url: string }[];
   setRegion: (region: string) => void;
   modalHandler: () => void;
   onChangeValue: (e: any) => void;
@@ -29,6 +30,7 @@ const AddProduct = ({
   mode,
   fileInputRef,
   imagesFiles,
+  imagePreview,
   setRegion,
   modalHandler,
   onChangeValue,
@@ -56,12 +58,10 @@ const AddProduct = ({
           </div>
           {imagesFiles &&
             imagesFiles.map((item) => {
-              const previewUrl = URL.createObjectURL(item);
-
               return (
                 <div
                   style={{
-                    backgroundImage: `url(${previewUrl})`,
+                    backgroundImage: `url(${imagePreview})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                   }}

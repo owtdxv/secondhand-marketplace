@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import AddProduct from "./AddProduct";
 import { createProduct } from "../../types/product";
 import axios from "axios";
@@ -106,6 +106,14 @@ const AddProductContainer = () => {
   const modalHandler = () => {
     setModal(!modal);
   };
+
+  const imagePreview = useMemo(() => {
+    return imagesFiles.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+  }, [imagesFiles]);
+
   return (
     <AddProduct
       modal={modal}
@@ -114,6 +122,7 @@ const AddProductContainer = () => {
       mode="new"
       fileInputRef={fileInputRef}
       imagesFiles={imagesFiles}
+      imagePreview={imagePreview}
       setRegion={setRegion}
       modalHandler={modalHandler}
       onChangeValue={onChangeValue}
