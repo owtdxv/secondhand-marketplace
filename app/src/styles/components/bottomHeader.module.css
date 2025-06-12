@@ -53,6 +53,7 @@
 
 /* 김효진 추가 */
 .searchDropdown {
+  z-index: 1000;
   position: absolute;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
@@ -60,9 +61,11 @@
   height: 163px;
   background-color: white;
   box-shadow: -3px 10px 10px rgba(0, 0, 0, 0.25);
+  padding-top: 34px;
+  padding-left: 16px;
+  padding-right: 16px;
 
   top: calc(100% + 12px);
-  right: 16px;
 }
 .searchInput {
   position: relative;
@@ -71,4 +74,41 @@
   width: 615px;
   height: 40px;
   border-bottom: 2px solid #61a872;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.keyword {
+  margin: 0px;
+  color: #a4a4a4;
+  font-size: 16px;
+  font-weight: 400;
+}
+.keywordContainer {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  white-space: nowrap;
+  gap: 16px;
+  margin: 0px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+/* 스와이프 가림 */
+.keywordContainer::-webkit-scrollbar {
+  display: none;
+}
+.keywords {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 8px 13px;
+  gap: 2px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
 }

@@ -9,6 +9,10 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from 'src/common/schemas/product.schema';
+import {
+  RecentSearch,
+  RecentSearchDocument,
+} from 'src/common/schemas/recentSearch';
 import { UserProductListDocument } from 'src/common/schemas/user-product-lists.schema';
 import { User, UserDocument } from 'src/common/schemas/user.schema';
 
@@ -22,6 +26,8 @@ export class ProductsService {
     private readonly viewedProductsModel: Model<UserProductListDocument>,
     private jwtService: JwtService,
     @InjectModel(User.name) private userModel: Model<ProductDocument>,
+    @InjectModel(RecentSearch.name)
+    private readonly recentSearchModel: Model<RecentSearchDocument>,
   ) {}
 
   /**
@@ -274,7 +280,7 @@ export class ProductsService {
     const sortMap = {
       //근데 최신순이면 createdAt을 기준으로? 아니면 수정시를 생각해서 updatedAt?
       //각각 순서대로 최신순, 낮은가격순, 높은 가격순
-      latest: { createdAt: -1 },
+      latest: { updatedAt: -1 },
       price_asc: { price: 1 },
       price_desc: { price: -1 },
     };
@@ -321,7 +327,7 @@ export class ProductsService {
     }
 
     //로그인한 사용자의 판매상품인경우를 체크하는 변수
-    const isMine = uid ? product.sellerId.toString() === uid : false;
+    const isMine = uid == '' ? product.sellerId.toString() === uid : false;
 
     //판메지의 정보를 가져와야하는데 이렇게 하는게 맞나?
     const seller: UserDocument = await this.userModel
@@ -343,10 +349,10 @@ export class ProductsService {
     let isLiked = false;
     let isUser = false;
     // 로그인한 사용자의 경우 좋아요와, 최근 본 상품에 등록
-    if (uid) {
+    if (uid != '') {
       isUser = true;
       const liked = await this.likedProductsModel.findOne({
-        uid,
+        uid: new Types.ObjectId(uid),
         productIds: product._id,
       });
       isLiked = !!liked;
@@ -640,5 +646,121 @@ export class ProductsService {
     await product.deleteOne();
 
     return { result: true, message: '상품이 삭제되었습니다.' };
+  }
+
+  //최근 검색어 얻어오기
+  async getRecentKeywords(uid: string) {
+    if (!Types.ObjectId.isValid(uid)) {
+      return { keywords: [] };
+    }
+    const keywords = await this.recentSearchModel.findOne({
+      uid: new Types.ObjectId(uid),
+    });
+
+    return { keywords: keywords?.keywords ?? [] };
+  }
+
+  async deleteRecentKeywords(keyword: string, uid: string) {
+    if (!Types.ObjectId.isValid(uid)) {
+      throw new BadRequestException('잘못된 사용자 ID입니다.');
+    }
+    const recentKeywords = await this.recentSearchModel.findOne({
+      uid: new Types.ObjectId(uid),
+    });
+    if (!recentKeywords) {
+      throw new NotFoundException('삭제할 키워드를 찾지 못했습니다.');
+    }
+
+    await this.recentSearchModel.updateOne(
+      { uid: new Types.ObjectId(uid) },
+      { $pull: { keywords: keyword } },
+    );
+
+    const updated = await this.recentSearchModel.findOne({
+      uid: new Types.ObjectId(uid),
+    });
+
+    return {
+      result: true,
+      message: '키워드가 삭제되었습니다.',
+      keywords: updated?.keywords ?? [],
+    };
+  }
+  //검색 상품 가져오기
+  async searchProducts({
+    input,
+    uid,
+    page,
+    limit,
+    filter,
+  }: {
+    input: string;
+    uid: string;
+    page: number;
+    limit: number;
+    filter: string;
+  }) {
+    const sortMap = {
+      latest: { updatedAt: -1 },
+      price_asc: { price: 1 },
+      price_desc: { price: -1 },
+    };
+    const sortOption = sortMap[filter] || sortMap['latest'];
+
+    const skip = (page - 1) * limit;
+
+    const [rawItems, total] = await Promise.all([
+      this.productModel
+        .find({
+          name: { $regex: input, $options: 'i' },
+        })
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.productModel.countDocuments({
+        name: { $regex: input, $options: 'i' },
+      }),
+    ]);
+
+    const items = rawItems.map((item) => ({
+      ...item,
+      lastUpdated: this.getRelativeTime(new Date((item as any).updatedAt)),
+    }));
+    // 로그인이 되어있는 경우에는 최근 검색어에 추가
+    if (Types.ObjectId.isValid(uid)) {
+      const normalizedInput = input.trim().toLowerCase();
+
+      const recent = await this.recentSearchModel.findOne({
+        uid: new Types.ObjectId(uid),
+      });
+
+      if (recent) {
+        recent.keywords = recent.keywords.filter(
+          (kw) => kw.trim().toLowerCase() !== normalizedInput,
+        );
+
+        recent.keywords.unshift(input); // 원래 입력값 그대로 추가
+
+        if (recent.keywords.length > 5) {
+          recent.keywords = recent.keywords.slice(0, 5);
+        }
+
+        await recent.save();
+      } else {
+        await this.recentSearchModel.create({
+          uid: new Types.ObjectId(uid),
+          keywords: [input],
+        });
+      }
+    }
+
+    return {
+      page,
+      totalPages: Math.ceil(total / limit),
+      totalProduct: total,
+      items,
+    };
   }
 }
