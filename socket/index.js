@@ -383,6 +383,69 @@ ${productContext}
   });
 });
 
+app.post("/api/vectorize", async (req, res) => {
+  try {
+    const { _id } = req.body;
+
+    if (!_id) {
+      return res.status(400).json({ error: "_id가 필요합니다." });
+    }
+
+    // Product에서 해당 ID의 상품 조회
+    const product = await Product.findById(_id).lean();
+
+    if (!product) {
+      return res.status(404).json({ error: "해당 상품을 찾을 수 없습니다." });
+    }
+
+    // 벡터 데이터 중복 방지
+    const existing = await mongoose.connection
+      .collection("product_vectors")
+      .findOne({ _id: _id });
+
+    if (existing) {
+      return res.status(200).json({ message: "이미 벡터화된 상품입니다." });
+    }
+
+    // 임베딩에 사용할 텍스트 구성
+    const content = `상품명: ${product.name}, 카테고리: ${
+      product.category
+    }, 가격: ${product.price}원, 설명: ${product.description ?? "정보 없음"}`;
+
+    // 임베딩 생성
+    const embedding = await embeddings.embedQuery(content);
+
+    if (!embedding || embedding.length === 0) {
+      return res.status(500).json({ error: "임베딩 생성 실패" });
+    }
+
+    // 벡터 저장
+    const vectorDoc = {
+      _id: product._id.toString(),
+      pageContent: content,
+      embedding,
+      metadata: {
+        _id: product._id.toString(),
+        name: product.name,
+        category: product.category,
+        likes: product.likes,
+        price: product.price,
+      },
+    };
+
+    await mongoose.connection
+      .collection("product_vectors")
+      .insertOne(vectorDoc);
+
+    res
+      .status(201)
+      .json({ message: "상품 벡터화 완료", productId: product._id });
+  } catch (error) {
+    console.error("상품 생성 및 벡터 저장 중 오류:", error);
+    res.status(500).json({ error: "서버 에러" });
+  }
+});
+
 server.listen(PORT, () => {
   console.log(`서버 실행(${PORT})`);
 });

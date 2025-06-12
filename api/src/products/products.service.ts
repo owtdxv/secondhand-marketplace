@@ -617,6 +617,7 @@ export class ProductsService {
 
     await product.save();
     return {
+      _id: product._id,
       statusCode: 201,
       message: '상품이 성공적으로 등록되었습니다.',
     };

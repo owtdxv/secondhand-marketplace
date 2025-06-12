@@ -104,7 +104,7 @@ const GeminiContainer: React.FC<GeminiContainerProps> = ({ socket }) => {
     setMessages(trimmedInput);
     if (socket && socket.connected && user && user._id) {
       // 상품데이터가 제대로 준비되면 사용하기
-      // socket.emit("sendAIMessage", { uid: user._id, query: trimmedInput }); // trimmedInput 사용
+      socket.emit("sendAIMessage", { uid: user._id, query: trimmedInput }); // trimmedInput 사용
     }
     setInput(""); // 전송 후 입력 필드 초기화
   };
