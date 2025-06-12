@@ -528,8 +528,7 @@ export class ProductsService {
 
   //상품 등록
   async createProduct({ body, uid }: { body: any; uid: string }) {
-    const { images, name, price, category, saleRegion, description, status } =
-      body;
+    const { images, name, price, category, saleRegion, description } = body;
 
     if (!images || !Array.isArray(images) || images.length === 0)
       throw new BadRequestException('상품 이미지를 1개 이상 포함해야 합니다.');

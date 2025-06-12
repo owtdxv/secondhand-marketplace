@@ -4,7 +4,11 @@ import {
   RegionGu,
 } from "../../dummy-data/korea-administrative-district";
 import { useState } from "react";
-const LocationModal = () => {
+
+interface PropsType {
+  setRegion: (region: string) => void;
+}
+const LocationModal = ({ setRegion }: PropsType) => {
   const [location, setLocation] = useState<number>(0);
 
   return (
@@ -31,7 +35,15 @@ const LocationModal = () => {
         </div>
         <div className={styles.Region}>
           {Region[location].map((item: string) => (
-            <div className={styles.RegionDetail}>{item}</div>
+            <div
+              onClick={() => {
+                setRegion(item);
+                console.log(item);
+              }}
+              className={styles.RegionDetail}
+            >
+              {item}
+            </div>
           ))}
         </div>
       </div>

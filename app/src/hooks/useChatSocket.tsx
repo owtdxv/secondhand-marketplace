@@ -6,8 +6,9 @@ const useChatSocket = (token: string | null) => {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
+    const socket_server_uri = import.meta.env.VITE_SOCKET_SERVER_URI;
     if (token) {
-      socketRef.current = io("http://localhost:8000", {
+      socketRef.current = io(socket_server_uri, {
         auth: { token },
       });
 
