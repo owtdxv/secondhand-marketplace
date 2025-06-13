@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/common/schemas/user.schema';
 import { Product, ProductSchema } from 'src/common/schemas/product.schema';
 import { UserProductListSchema } from 'src/common/schemas/user-product-lists.schema';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserProductListSchema } from 'src/common/schemas/user-product-lists.sch
       { name: 'ViewedProducts', schema: UserProductListSchema },
     ]),
     ProductsModule,
+    AuthModule,
   ],
   providers: [UsersService, JwtStrategy],
   controllers: [UsersController],
