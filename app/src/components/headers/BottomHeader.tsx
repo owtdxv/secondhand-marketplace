@@ -79,6 +79,10 @@ const BottomHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(() => {
+    window.addEventListener("openChatWidgetRequest", toggleChatUI);
+  }, []);
+
   // /search가 아닌경우에는 검색갑 초기화
   useEffect(() => {
     if (location.pathname !== "/search") {
