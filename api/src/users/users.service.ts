@@ -1,4 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from 'src/common/schemas/product.schema';
@@ -51,5 +57,67 @@ export class UsersService {
         soldOut: soldOutCount,
       },
     };
+  }
+
+  /**
+   * 사용자의 프로필 이미지를 수정합니다
+   * @param uid 사용자 uid
+   * @param url 업로드한 프로필 이미지 url
+   */
+  async editProfileImage(uid: string, url: string) {
+    if (!url) {
+      throw new BadRequestException('잘못된 요청입니다');
+    }
+
+    const user = await this.userModel.findById(uid);
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다');
+    }
+
+    if (user.provider !== 'local') {
+      throw new ForbiddenException(
+        '소셜 로그인 사용자는 프로필 이미지를 수정할 수 없습니다',
+      );
+    }
+    user.profileImage = url;
+    await user.save();
+
+    return {
+      success: true,
+    };
+  }
+
+  /**
+   * 사용자 닉네임을 수정합니다
+   * @param uid 사용자 uid
+   * @param displayName 변경할 닉네임
+   */
+  async changeDisplayName(
+    uid: String,
+    displayName: string,
+  ): Promise<{ success: Boolean }> {
+    const user = await this.userModel.findById(uid);
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다');
+    }
+
+    if (user.provider !== 'local') {
+      throw new ForbiddenException(
+        '소셜 로그인 사용자는 닉네임을 수정할 수 없습니다',
+      );
+    }
+
+    // 닉네임 중복 검사
+    const existing = await this.userModel.exists({ displayName });
+    if (existing) {
+      throw new ConflictException('이미 사용중인 닉네임입니다.');
+    }
+
+    const result = await this.userModel.updateOne(
+      { _id: uid },
+      { $set: { displayName } },
+    );
+
+    return { success: result.modifiedCount > 0 };
   }
 }

@@ -124,29 +124,6 @@ export class AuthService {
   }
 
   /**
-   * 사용자 닉네임을 수정합니다
-   * @param uid 사용자 uid
-   * @param displayName 변경할 닉네임
-   */
-  async changeDisplayName(
-    uid: String,
-    displayName: string,
-  ): Promise<{ success: Boolean }> {
-    // 닉네임 중복 검사
-    const existing = await this.userModel.exists({ displayName });
-    if (existing) {
-      throw new ConflictException('이미 사용중인 닉네임입니다.');
-    }
-
-    const result = await this.userModel.updateOne(
-      { _id: uid },
-      { $set: { displayName } },
-    );
-
-    return { success: result.modifiedCount > 0 };
-  }
-
-  /**
    * 네이버 콜백을 처리합니다
    * @param code 네이버가 제공해준 code값
    * @param state 네이버가 제공해준 state값
@@ -189,6 +166,22 @@ export class AuthService {
       });
 
       await user.save();
+    } else {
+      // 사용자가 존재할 경우, 프로필 정보 업데이트
+      let isUpdated = false;
+
+      if (user.displayName !== profile.nickname) {
+        user.displayName = profile.nickname;
+        isUpdated = true;
+      }
+      if (user.profileImage !== profile.profile_image) {
+        user.profileImage = profile.profile_image;
+        isUpdated = true;
+      }
+
+      if (isUpdated) {
+        await user.save(); // 변경된 내용이 있으면 저장
+      }
     }
 
     // 로그인 처리

@@ -6,21 +6,44 @@ import {
   Req,
   UseGuards,
   ForbiddenException,
+  Put,
+  Body,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { ProductsService } from 'src/products/products.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private userService: UsersService,
     private productService: ProductsService,
+    private authService: AuthService,
   ) {}
 
   @Get('/:uid')
   getUserInfo(@Param('uid') uid: string) {
     return this.userService.getUserInfo(uid);
+  }
+
+  @Put('/edit/profile-img')
+  @UseGuards(AuthGuard('jwt'))
+  editProfileImage(@Req() req, @Body('url') url: string) {
+    return this.userService.editProfileImage(req.user.uid, url);
+  }
+
+  @Put('/edit/displayname')
+  @UseGuards(AuthGuard('jwt'))
+  async changeName(
+    @Req() req: any,
+    @Body() body: { displayName: string },
+  ): Promise<any> {
+    const uid = req.user.uid;
+    const { displayName } = body;
+    const success = (await this.userService.changeDisplayName(uid, displayName))
+      .success;
+    return this.authService.getProfile(uid);
   }
 
   @Get('/product/sold/:uid')
