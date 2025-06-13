@@ -100,7 +100,7 @@ const MyPageContainer = () => {
       e.preventDefault();
       axios
         .put(
-          "/api/auth/edit/displayname",
+          "/api/user/edit/displayname",
           { displayName: nickName },
           {
             headers: {
