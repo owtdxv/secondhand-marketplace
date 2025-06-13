@@ -103,6 +103,7 @@ const UpdateProductContainer = () => {
 
   const updateProduct = async () => {
     try {
+      const BASE_URL = import.meta.env.VITE_SOCKET_SERVER_URI;
       //firebase에 파일 업로드
       const urls = await uploadFileAndGetUrls(imagesFiles);
       console.log("업로드 된 URL:", urls);
@@ -122,10 +123,18 @@ const UpdateProductContainer = () => {
             Authorization: `Bearer ${token}`,
           },
         })
-        .then((res) => {
-          console.log(res);
-          alert("상품 수정이 완료되었습니다.");
-          navigate(`/products/${productId}`);
+        .then(async (res) => {
+          console.log(res.data);
+          await axios
+            .put(`${BASE_URL}/api/edit/vectorize`, { _id: res.data._id })
+            .then((vectorRes) => {
+              console.log("벡터화 성공:", vectorRes.data);
+              alert("상품 수정이 완료되었습니다.");
+              navigate(`/products/${productId}`); // 모든 작업 완료 후 이동
+            })
+            .catch((err) => {
+              console.error("벡터화 실패:", err);
+            });
         })
         .catch((err) => {
           console.log(err);
