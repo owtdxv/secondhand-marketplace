@@ -1,7 +1,9 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -66,6 +68,23 @@ export class UsersService {
     if (!url) {
       throw new BadRequestException('잘못된 요청입니다');
     }
+
+    const user = await this.userModel.findById(uid);
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다');
+    }
+
+    if (user.provider !== 'local') {
+      throw new ForbiddenException(
+        '소셜 로그인 사용자는 프로필 이미지를 수정할 수 없습니다',
+      );
+    }
+    user.profileImage = url;
+    await user.save();
+
+    return {
+      success: true,
+    };
   }
 
   /**
@@ -77,6 +96,17 @@ export class UsersService {
     uid: String,
     displayName: string,
   ): Promise<{ success: Boolean }> {
+    const user = await this.userModel.findById(uid);
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다');
+    }
+
+    if (user.provider !== 'local') {
+      throw new ForbiddenException(
+        '소셜 로그인 사용자는 닉네임을 수정할 수 없습니다',
+      );
+    }
+
     // 닉네임 중복 검사
     const existing = await this.userModel.exists({ displayName });
     if (existing) {
