@@ -4,11 +4,13 @@ import { ProductDetailInfo } from "../../types/product";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { User } from "../../types/user";
 
 const ProductDetailPageContainer = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState<ProductDetailInfo>();
   const [currentImageNum, setCurrentImageNum] = useState(1);
+  const [user, setUser] = useState<User | null>(null);
 
   const [showStatusMenu, setShowStatusMenu] = useState(false);
 
@@ -38,6 +40,36 @@ const ProductDetailPageContainer = () => {
     }
   };
 
+  const onClickChat = async () => {
+    if (!user) {
+      alert("로그인이 필요한 서비스입니다");
+      return;
+    }
+    if (!product) return; // product가 없을 경우를 대비
+
+    const token = sessionStorage.getItem("token");
+    try {
+      await axios
+        .post(
+          "/api/chat/newchat",
+          {
+            participants: [user._id, product.sellerId],
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          window.dispatchEvent(new Event("openChatWidgetRequest"));
+        });
+    } catch (err) {
+      alert("해당 사용자와 채팅할 수 없습니다!");
+      console.error("채팅방 생성 오류", err);
+    }
+  };
+
   useEffect(() => {
     if (!productId) return;
     const token = sessionStorage.getItem("token");
@@ -57,17 +89,29 @@ const ProductDetailPageContainer = () => {
       });
   }, [productId]);
 
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    axios
+      .get("/api/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setUser(res.data);
+      });
+  }, []);
+
   if (!product) return <div>Loading...</div>;
 
   const onImageChange = (imageNum: number) => {
     setCurrentImageNum(imageNum);
   };
 
-  // 로그인 안한 유저인 경우에는 alert로 로그인이 필요함
-  // 로그인 한 유저인 경우 상품 좋아요 처리
   const onLikeToggle = async () => {
     if (!product || !productId) return;
-    if (!product.isUser) {
+    if (!user) {
+      // product.isUser 대신 user 상태를 직접 확인하는 것이 더 명확합니다.
       alert("로그인이 필요한 서비스입니다.");
       return;
     }
@@ -91,18 +135,32 @@ const ProductDetailPageContainer = () => {
   };
 
   const onClickDelete = async () => {
+    const BASE_URL = import.meta.env.VITE_SOCKET_SERVER_URI;
     if (!product || !productId) return;
     const token = sessionStorage.getItem("token");
     try {
-      await axios.delete(`/api/product/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      alert("상품이 삭제되었습니다.");
-      navigate("/products"); // 삭제 후 상품 목록 페이지로 이동
+      await axios
+        .delete(`/api/product/${productId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(async (res) => {
+          await axios
+            .delete(`${BASE_URL}/api/delete/vectorize`, {
+              data: { _id: res.data._id },
+            })
+            .then((res) => {
+              alert("상품이 삭제되었습니다.");
+              navigate("/products");
+            });
+        });
     } catch (err) {
       console.error("상품 삭제 요청 실패", err);
       alert("상품 삭제에 실패했습니다.");
     }
+  };
+
+  const onClickEditMode = () => {
+    navigate(`/update-product/${productId}`);
   };
 
   return (
@@ -116,6 +174,8 @@ const ProductDetailPageContainer = () => {
       toggleStatusMenu={toggleStatusMenu}
       onChangeStatus={onChangeStatus}
       onClickDelete={onClickDelete}
+      onClickEditMode={onClickEditMode}
+      onClickChat={onClickChat}
     />
   );
 };

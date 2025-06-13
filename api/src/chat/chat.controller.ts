@@ -38,6 +38,12 @@ export class ChatController {
     return this.chatService.getChatRoomsByUserId(uid);
   }
 
+  @Get('/room/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async getChatRoomData(@Param('id') id: string, @Req() req: any) {
+    return this.chatService.getChatRoomInfoByRoomId(id, req.user.uid);
+  }
+
   @Get('/message/:roomid')
   async getMessages(@Param('roomid') roomId: string) {
     return this.chatService.getMessagesByRoomId(roomId);

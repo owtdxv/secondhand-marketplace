@@ -13,6 +13,10 @@ const chatRoomSchema = new Schema(
         message: "participants는 정확히 2명의 사용자 ID 배열이어야 합니다.",
       },
     },
+    isNewChatRoom: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

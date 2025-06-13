@@ -20,6 +20,11 @@ export interface createProduct {
   description?: string;
   images?: string[];
 }
+
+export interface getRecommendProductResponse {
+  items: ProductInfo[];
+}
+
 export interface ProductDetailInfo {
   _id: string;
   category: string;

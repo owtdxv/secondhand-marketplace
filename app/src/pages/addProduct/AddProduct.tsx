@@ -10,13 +10,15 @@ interface PropsType {
   modal: boolean;
   region: string;
   data: createProduct;
+  mode: string;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   imagesFiles: File[];
+  imagePreview: { file: File; url: string }[];
   setRegion: (region: string) => void;
   modalHandler: () => void;
   onChangeValue: (e: any) => void;
-  removeImage: (targetFile: File) => void;
-  createProduct: () => void;
+  removeImage: (target: File | string) => void;
+  onClickSubmit: () => void;
   handleCameraClick: () => void;
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -25,13 +27,15 @@ const AddProduct = ({
   modal,
   region,
   data,
+  mode,
   fileInputRef,
   imagesFiles,
+  imagePreview,
   setRegion,
   modalHandler,
   onChangeValue,
   removeImage,
-  createProduct,
+  onClickSubmit,
   handleCameraClick,
   handleImageChange,
 }: PropsType) => {
@@ -54,12 +58,10 @@ const AddProduct = ({
           </div>
           {imagesFiles &&
             imagesFiles.map((item) => {
-              const previewUrl = URL.createObjectURL(item);
-
               return (
                 <div
                   style={{
-                    backgroundImage: `url(${previewUrl})`,
+                    backgroundImage: `url(${imagePreview})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                   }}
@@ -76,9 +78,30 @@ const AddProduct = ({
                 </div>
               );
             })}
+          {data.images &&
+            data.images.map((item) => (
+              <div
+                style={{
+                  backgroundImage: `url(${item})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+                className={styles.IsPhoto}
+              >
+                <div>
+                  <div
+                    onClick={() => removeImage(item)}
+                    className={styles.delete}
+                  >
+                    <img width={13} height={13} src={XButton} />
+                  </div>
+                </div>
+              </div>
+            ))}
         </div>
         <Input
           name="name"
+          value={data.name}
           onChange={onChangeValue}
           type="text"
           placeholder="상품명을 입력해주세요."
@@ -88,6 +111,7 @@ const AddProduct = ({
           <div className={styles.wrapSelect}>
             <select
               name="category"
+              value={data.category}
               onChange={onChangeValue}
               required
               className={styles.select}
@@ -130,15 +154,17 @@ const AddProduct = ({
           type="number"
           placeholder="₩ 상품의 가격을 입력해주세요"
           width="850px"
+          value={data.price}
         />
         <textarea
           name="description"
           onChange={onChangeValue}
           className={styles.textarea}
           placeholder="상품에 대한 설명을 입력해주세요."
+          value={data.description}
         ></textarea>
-        <button onClick={createProduct} className={styles.submitBtn}>
-          등록하기
+        <button onClick={onClickSubmit} className={styles.submitBtn}>
+          {mode == "edit" ? "수정하기" : "등록하기"}
         </button>
       </div>
     </div>

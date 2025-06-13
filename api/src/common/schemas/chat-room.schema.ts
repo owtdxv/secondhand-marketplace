@@ -16,6 +16,9 @@ export class ChatRoom {
   })
   participants!: Types.ObjectId[];
 
+  @Prop({ type: Boolean, default: true })
+  isNewChatRoom!: boolean;
+
   @Prop()
   createdAt!: Date;
 
