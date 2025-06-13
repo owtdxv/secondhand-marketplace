@@ -446,6 +446,95 @@ app.post("/api/vectorize", async (req, res) => {
   }
 });
 
+app.put("/api/edit/vectorize", async (req, res) => {
+  const { _id } = req.body;
+
+  try {
+    if (!_id) {
+      return res.status(400).json({ error: "_id가 필요합니다." });
+    }
+
+    // 1. Product에서 해당 ID의 최신 상품 정보 조회
+    const product = await Product.findById(_id).lean();
+
+    if (!product) {
+      console.log(1);
+      return res
+        .status(404)
+        .json({ error: "해당 상품을 찾을 수 없습니다. (Product 컬렉션)" });
+    }
+
+    // 2. 임베딩에 사용할 텍스트 구성 (최신 상품 정보 반영)
+    const content = `상품명: ${product.name}, 카테고리: ${
+      product.category
+    }, 가격: ${product.price}원, 설명: ${product.description ?? "정보 없음"}`;
+
+    // 3. 새로운 임베딩 생성
+    const newEmbedding = await embeddings.embedQuery(content);
+
+    if (!newEmbedding || newEmbedding.length === 0) {
+      return res.status(500).json({ error: "새로운 임베딩 생성 실패" });
+    }
+
+    // 4. product_vectors 컬렉션 업데이트
+    const updatedVectorDoc = await mongoose.connection
+      .collection("product_vectors")
+      .findOneAndUpdate(
+        { _id: _id }, // 검색 조건
+        {
+          $set: {
+            pageContent: content,
+            embedding: newEmbedding,
+            metadata: {
+              _id: product._id.toString(),
+              name: product.name,
+              category: product.category,
+              likes: product.likes,
+              price: product.price,
+            },
+          },
+        },
+        { returnDocument: "after" } // 업데이트된 문서를 반환
+      );
+
+    res
+      .status(200)
+      .json({ message: "상품 벡터화 데이터 업데이트 완료", productId: _id });
+  } catch (error) {
+    console.error("상품 벡터 데이터 업데이트 중 오류:", error);
+    res.status(500).json({ error: "서버 에러" });
+  }
+});
+
+app.delete("/api/delete/vectorize", async (req, res) => {
+  const { _id } = req.body;
+
+  try {
+    if (!_id) {
+      return res.status(400).json({ error: "_id가 필요합니다." });
+    }
+
+    // product_vectors 컬렉션에서 해당 _id 문서 삭제
+    const result = await mongoose.connection
+      .collection("product_vectors")
+      .deleteOne({ _id: _id });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        error: "해당 상품의 벡터 데이터를 찾을 수 없습니다.",
+      });
+    }
+
+    res.status(200).json({
+      message: "상품 벡터화 데이터 삭제 완료",
+      productId: _id,
+    });
+  } catch (error) {
+    console.error("상품 벡터 데이터 삭제 중 오류:", error);
+    res.status(500).json({ error: "서버 에러" });
+  }
+});
+
 server.listen(PORT, () => {
   console.log(`서버 실행(${PORT})`);
 });

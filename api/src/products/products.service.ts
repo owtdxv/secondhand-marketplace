@@ -662,6 +662,7 @@ export class ProductsService {
     await product.save();
 
     return {
+      _id: product._id,
       statusCode: 200,
       message: '상품이 성공적으로 수정되었습니다.',
     };
@@ -705,7 +706,11 @@ export class ProductsService {
 
     await product.deleteOne();
 
-    return { result: true, message: '상품이 삭제되었습니다.' };
+    return {
+      _id: product._id,
+      result: true,
+      message: '상품이 삭제되었습니다.',
+    };
   }
 
   //최근 검색어 얻어오기

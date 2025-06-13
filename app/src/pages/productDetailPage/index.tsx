@@ -135,14 +135,24 @@ const ProductDetailPageContainer = () => {
   };
 
   const onClickDelete = async () => {
+    const BASE_URL = import.meta.env.VITE_SOCKET_SERVER_URI;
     if (!product || !productId) return;
     const token = sessionStorage.getItem("token");
     try {
-      await axios.delete(`/api/product/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      alert("상품이 삭제되었습니다.");
-      navigate("/products");
+      await axios
+        .delete(`/api/product/${productId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(async (res) => {
+          await axios
+            .delete(`${BASE_URL}/api/delete/vectorize`, {
+              data: { _id: res.data._id },
+            })
+            .then((res) => {
+              alert("상품이 삭제되었습니다.");
+              navigate("/products");
+            });
+        });
     } catch (err) {
       console.error("상품 삭제 요청 실패", err);
       alert("상품 삭제에 실패했습니다.");
@@ -166,7 +176,6 @@ const ProductDetailPageContainer = () => {
       onClickDelete={onClickDelete}
       onClickEditMode={onClickEditMode}
       onClickChat={onClickChat}
-
     />
   );
 };
