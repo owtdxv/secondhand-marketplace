@@ -2,12 +2,15 @@ import styles from "@/styles/pages/myPage.module.css";
 import Content from "./Content";
 import editIcon from "@/assets/icon/edit.png";
 import { ProductInfo } from "../../types/product";
+import { UserInfo } from "../../types/user";
+
 interface PropsType {
   page: string;
   editMode: boolean;
   data: ProductInfo[];
+  userInfo: UserInfo | undefined;
+  nickName?: string;
   filter?: string;
-  nickName: string;
   handleEditMode: () => void;
   onChangePage: (page: string) => void;
   onChangeFilter: (filter: string) => void;
@@ -19,8 +22,9 @@ const MyPage = ({
   page,
   editMode,
   data,
-  filter,
   nickName,
+  userInfo,
+  filter,
   handleEditMode,
   onChangePage,
   onChangeFilter,
@@ -62,7 +66,7 @@ const MyPage = ({
                     />
                   ) : (
                     <h1 className={styles.nickName}>
-                      내가 이 구역 판매왕
+                      {nickName}
                       <img
                         onClick={handleEditMode}
                         width={23}
@@ -72,7 +76,7 @@ const MyPage = ({
                     </h1>
                   )}
 
-                  <p className={styles.email}>chhari0708@naver.com</p>
+                  <p className={styles.email}>{userInfo?.email}</p>
                 </div>
               </div>
 
@@ -82,12 +86,12 @@ const MyPage = ({
                   className={styles.wrapState}
                 >
                   <p>전체</p>
-                  <div>15</div>
+                  <div>{userInfo?.productCounts.total}</div>
                 </div>
                 <div className={styles.verticalLine}></div>
                 <div className={styles.wrapState}>
                   <p>판매중</p>
-                  <div>3</div>
+                  <div>{userInfo?.productCounts.onSale}</div>
                 </div>
                 <div className={styles.verticalLine}></div>
                 <div
@@ -95,7 +99,7 @@ const MyPage = ({
                   className={styles.wrapState}
                 >
                   <p>판매 완료</p>
-                  <div>12</div>
+                  <div>{userInfo?.productCounts.soldOut}</div>
                 </div>
               </div>
             </div>

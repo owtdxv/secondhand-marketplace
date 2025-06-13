@@ -31,7 +31,6 @@ const ProductListContainer = () => {
         const res = await axios.get("/api/product", {
           params: { page, filter },
         });
-        console.log(res.data);
         setProducts(res.data.items);
         setCurrentPage(res.data.page);
         setTotalPage(res.data.totalPages);

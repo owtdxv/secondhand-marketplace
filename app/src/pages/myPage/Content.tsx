@@ -15,34 +15,34 @@ const MyProduct = ({ data, title, filter, onChangeFilter }: PropsType) => {
       <div className={styles.myPageTitle}>{title}</div>
       {title === "최근 본 상품" ? null : (
         <p className={styles.product}>
-          상품 <span className={styles.redText}>10</span>
+          상품 <span className={styles.redText}>{data.length}</span>
         </p>
       )}
       <hr className={styles.line} />
       {title === "최근 본 상품" ? null : (
         <div className={styles.filter}>
           <div
-            style={{ color: filter === "Recent" ? "black" : "#d9d9d9" }}
+            style={{ color: filter === "latest" ? "black" : "#d9d9d9" }}
             onClick={() => {
-              onChangeFilter?.("Recent");
+              onChangeFilter?.("latest");
             }}
           >
             최신순
           </div>
           <div className={styles.verticalShort}></div>
           <div
-            style={{ color: filter === "rowCosts" ? "black" : "#d9d9d9" }}
+            style={{ color: filter === "price_asc" ? "black" : "#d9d9d9" }}
             onClick={() => {
-              onChangeFilter?.("rowCosts");
+              onChangeFilter?.("price_asc");
             }}
           >
             낮은 가격순
           </div>
           <div className={styles.verticalShort}></div>
           <div
-            style={{ color: filter === "highCosts" ? "black" : "#d9d9d9" }}
+            style={{ color: filter === "price_desc" ? "black" : "#d9d9d9" }}
             onClick={() => {
-              onChangeFilter?.("highCosts");
+              onChangeFilter?.("price_desc");
             }}
           >
             높은 가격순

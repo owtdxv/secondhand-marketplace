@@ -81,7 +81,6 @@ const ProductDetailPageContainer = () => {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setProduct(res.data);
       })
       .catch((err) => {
@@ -122,7 +121,6 @@ const ProductDetailPageContainer = () => {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
-          console.log(res.data);
           setProduct({
             ...product,
             isLiked: res.data.isLiked,
@@ -154,7 +152,6 @@ const ProductDetailPageContainer = () => {
             });
         });
     } catch (err) {
-      console.error("상품 삭제 요청 실패", err);
       alert("상품 삭제에 실패했습니다.");
     }
   };

@@ -58,7 +58,7 @@ const Main = ({
           </div>
           <div className={styles.wrapProducts}>
             {recentData?.items.map((item: ProductInfo) => (
-              <Product data={item} />
+              <Product data={item} key={item._id} />
             ))}
           </div>
           <PageNation
@@ -82,7 +82,7 @@ const Main = ({
           </div>
           <div className={styles.wrapProducts}>
             {topLikeData?.items.map((item: ProductInfo) => (
-              <Product data={item} />
+              <Product data={item} key={item._id} />
             ))}
           </div>
           <PageNation
@@ -106,7 +106,7 @@ const Main = ({
           </div>
           <div className={styles.wrapProducts}>
             {topViewData?.items.map((item: ProductInfo) => (
-              <Product data={item} />
+              <Product data={item} key={item._id} />
             ))}
           </div>
           <PageNation

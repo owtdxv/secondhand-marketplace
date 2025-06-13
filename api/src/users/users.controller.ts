@@ -72,20 +72,10 @@ export class UsersController {
 
   @Get('/:uid/views')
   @UseGuards(AuthGuard('jwt'))
-  getUserViewedProduct(
-    @Param('uid') uid: string,
-    @Req() req,
-    @Query('page') page = '1',
-    @Query('filter') filter: string,
-  ) {
+  getUserViewedProduct(@Param('uid') uid: string, @Req() req) {
     if (req.user.uid !== uid) {
       throw new ForbiddenException('접근 권한이 없습니다.');
     }
-    return this.productService.getViewedProduct(
-      uid,
-      parseInt(page),
-      10,
-      filter,
-    );
+    return this.productService.getViewedProduct(uid);
   }
 }
