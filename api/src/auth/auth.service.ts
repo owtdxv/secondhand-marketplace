@@ -124,29 +124,6 @@ export class AuthService {
   }
 
   /**
-   * 사용자 닉네임을 수정합니다
-   * @param uid 사용자 uid
-   * @param displayName 변경할 닉네임
-   */
-  async changeDisplayName(
-    uid: String,
-    displayName: string,
-  ): Promise<{ success: Boolean }> {
-    // 닉네임 중복 검사
-    const existing = await this.userModel.exists({ displayName });
-    if (existing) {
-      throw new ConflictException('이미 사용중인 닉네임입니다.');
-    }
-
-    const result = await this.userModel.updateOne(
-      { _id: uid },
-      { $set: { displayName } },
-    );
-
-    return { success: result.modifiedCount > 0 };
-  }
-
-  /**
    * 네이버 콜백을 처리합니다
    * @param code 네이버가 제공해준 code값
    * @param state 네이버가 제공해준 state값

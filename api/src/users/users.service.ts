@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from 'src/common/schemas/product.schema';
@@ -62,5 +66,28 @@ export class UsersService {
     if (!url) {
       throw new BadRequestException('잘못된 요청입니다');
     }
+  }
+
+  /**
+   * 사용자 닉네임을 수정합니다
+   * @param uid 사용자 uid
+   * @param displayName 변경할 닉네임
+   */
+  async changeDisplayName(
+    uid: String,
+    displayName: string,
+  ): Promise<{ success: Boolean }> {
+    // 닉네임 중복 검사
+    const existing = await this.userModel.exists({ displayName });
+    if (existing) {
+      throw new ConflictException('이미 사용중인 닉네임입니다.');
+    }
+
+    const result = await this.userModel.updateOne(
+      { _id: uid },
+      { $set: { displayName } },
+    );
+
+    return { success: result.modifiedCount > 0 };
   }
 }
