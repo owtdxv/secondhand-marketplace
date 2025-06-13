@@ -6,6 +6,8 @@ import {
   Req,
   UseGuards,
   ForbiddenException,
+  Put,
+  Body,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
@@ -21,6 +23,12 @@ export class UsersController {
   @Get('/:uid')
   getUserInfo(@Param('uid') uid: string) {
     return this.userService.getUserInfo(uid);
+  }
+
+  @Put('/edit/profile-img')
+  @UseGuards(AuthGuard('jwt'))
+  editProfileImage(@Req() req, @Body('url') url: string) {
+    return this.userService.editProfileImage(req.user.uid, url);
   }
 
   @Get('/product/sold/:uid')

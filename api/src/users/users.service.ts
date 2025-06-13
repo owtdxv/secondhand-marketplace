@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from 'src/common/schemas/product.schema';
@@ -51,5 +51,16 @@ export class UsersService {
         soldOut: soldOutCount,
       },
     };
+  }
+
+  /**
+   * 사용자의 프로필 이미지를 수정합니다
+   * @param uid 사용자 uid
+   * @param url 업로드한 프로필 이미지 url
+   */
+  async editProfileImage(uid: string, url: string) {
+    if (!url) {
+      throw new BadRequestException('잘못된 요청입니다');
+    }
   }
 }

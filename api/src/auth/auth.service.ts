@@ -189,6 +189,22 @@ export class AuthService {
       });
 
       await user.save();
+    } else {
+      // 사용자가 존재할 경우, 프로필 정보 업데이트
+      let isUpdated = false;
+
+      if (user.displayName !== profile.nickname) {
+        user.displayName = profile.nickname;
+        isUpdated = true;
+      }
+      if (user.profileImage !== profile.profile_image) {
+        user.profileImage = profile.profile_image;
+        isUpdated = true;
+      }
+
+      if (isUpdated) {
+        await user.save(); // 변경된 내용이 있으면 저장
+      }
     }
 
     // 로그인 처리
