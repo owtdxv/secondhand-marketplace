@@ -285,6 +285,8 @@ export class ProductsService {
       price_desc: { price: -1 },
     };
 
+    const query = { status: '판매중' };
+
     const sortOption = sortMap[filter] || sortMap['latest'];
 
     //28개씩 상품들을 나눠서 보여줌
@@ -292,13 +294,13 @@ export class ProductsService {
 
     const [rawItems, total] = await Promise.all([
       this.productModel
-        .find()
+        .find(query)
         .sort(sortOption)
         .skip(skip)
         .limit(limit)
         .lean()
         .exec(),
-      this.productModel.countDocuments(),
+      this.productModel.countDocuments(query),
     ]);
 
     const items = rawItems.map((item) => ({
@@ -448,10 +450,12 @@ export class ProductsService {
   async getRecentProducts({ page, limit }: { page: number; limit: number }) {
     const maxLimit = 30;
 
+    const query = { status: '판매중' };
+
     const skip = (page - 1) * limit;
 
     const rawItems = await this.productModel
-      .find()
+      .find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -475,11 +479,11 @@ export class ProductsService {
   //메인 좋아요가 많은 상품 최대 30개
   async getTopLikeProducts({ page, limit }: { page: number; limit: number }) {
     const maxLimit = 30;
-
+    const query = { status: '판매중' };
     const skip = (page - 1) * limit;
 
     const rawItems = await this.productModel
-      .find()
+      .find(query)
       .sort({ likes: -1 })
       .skip(skip)
       .limit(limit)
@@ -503,11 +507,12 @@ export class ProductsService {
   //메인 조회수가 많은 상품 최대 30개
   async getTopViewProducts({ page, limit }: { page: number; limit: number }) {
     const maxLimit = 30;
+    const query = { status: '판매중' };
 
     const skip = (page - 1) * limit;
 
     const rawItems = await this.productModel
-      .find()
+      .find(query)
       .sort({ views: -1 })
       .skip(skip)
       .limit(limit)
@@ -709,12 +714,14 @@ export class ProductsService {
     };
     const sortOption = sortMap[filter] || sortMap['latest'];
 
+    const query = { status: '판매중' };
     const skip = (page - 1) * limit;
 
     const [rawItems, total] = await Promise.all([
       this.productModel
         .find({
           name: { $regex: input, $options: 'i' },
+          query,
         })
         .sort(sortOption)
         .skip(skip)
