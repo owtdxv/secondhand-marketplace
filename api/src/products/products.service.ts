@@ -251,25 +251,8 @@ export class ProductsService {
   /**
    * 사용자가 최근 확인한 상품 정보를 filter조건에 맞게 반환합니다
    * @param uid 사용자 uid
-   * @param page 현재 페이지 번호
-   * @param limit 페이지 당 상품 수
-   * @param filter 정렬 조건
    */
-  async getViewedProduct(
-    uid: string,
-    page: number,
-    limit: number,
-    filter: string = 'latest',
-  ) {
-    const sortMap = {
-      latest: { createdAt: -1 },
-      price_asc: { price: 1 },
-      price_desc: { price: -1 },
-    };
-    const sortOption = sortMap[filter] || sortMap['latest'];
-
-    const skip = (page - 1) * limit;
-
+  async getViewedProduct(uid: string) {
     // 1단계: 유저의 찜 목록 가져오기
     const userViewedList = await this.viewedProductsModel
       .findOne({ uid: new Types.ObjectId(uid) })
@@ -282,30 +265,31 @@ export class ProductsService {
       userViewedList.productIds.length === 0
     ) {
       return {
-        page,
-        totalPages: 0,
         items: [],
       };
     }
+    // 2단계: productIds 배열을 꺼내서 조회
+    const productIds = userViewedList.productIds;
 
-    const likedProductIds = userViewedList.productIds;
+    // 먼저 모든 상품을 가져옴
+    const products = await this.productModel
+      .find({ _id: { $in: productIds } })
+      .lean()
+      .exec();
 
-    // 2단계: 찜한 상품 중 일부만 정렬 + 페이징해서 가져오기
-    const [items, total] = await Promise.all([
-      this.productModel
-        .find({ _id: { $in: likedProductIds } })
-        .sort(sortOption)
-        .skip(skip)
-        .limit(limit)
-        .lean()
-        .exec(),
-      this.productModel.countDocuments({ _id: { $in: likedProductIds } }),
-    ]);
+    // id 기준으로 맵핑해두기 (빠른 탐색 위해)
+    const productMap = new Map(products.map((p) => [p._id.toString(), p]));
+
+    // 원본 저장된 순서대로 재정렬
+    const orderedProducts = productIds
+      .map((id) => productMap.get(id.toString()))
+      .filter((p) => p); // 혹시 삭제된 상품 걸러내기
 
     return {
-      page,
-      totalPages: Math.ceil(total / limit),
-      items,
+      items: orderedProducts.map((product) => ({
+        ...product,
+        lastUpdated: this.getRelativeTime(new Date((product as any).updatedAt)),
+      })),
     };
   }
 

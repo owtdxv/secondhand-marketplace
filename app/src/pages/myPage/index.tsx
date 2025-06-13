@@ -14,8 +14,6 @@ const MyPageContainer = () => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  // const page = parseInt(searchParams.get("page") || "1");
-  // const filter = searchParams.get("filter") || "lates";
   const [products, setProducts] = useState([]);
   const [uid, setUid] = useState("");
 
@@ -33,32 +31,20 @@ const MyPageContainer = () => {
       .then((res) => {
         // 이후 내 ID로 유저 상세정보 요청
         setUid(res.data._id);
-        console.log("userID설정 완료");
         return axios.get(`/api/users/${res.data._id}`);
       })
       .then((res) => {
-        console.log("유저 상세정보:", res.data);
         setUserInfo(res.data);
         setNickName(res.data.displayName);
       })
       .catch((err) => {
-        console.error("에러 발생:", err);
         alert("유저 정보 조회에 실패했습니다.");
       });
   }, []);
 
   const handleEditMode = () => {
     setEditMode(!editMode);
-    console.log(editMode);
   };
-
-  // const onChangePage = (page: string) => {
-  //   setPage(page);
-  // };
-
-  // const onChangeFilter = (filter: string) => {
-  //   setFilter(filter);
-  // };
 
   //페이지 변경시
   const onChangePage = (page: string) => {
@@ -67,9 +53,6 @@ const MyPageContainer = () => {
   };
   //필터 변경시
   const onChangeFilter = (newFilter: string) => {
-    // searchParams.set("filter", newFilter);
-    // searchParams.set("page", "1"); // 정렬 바꾸면 페이지 1로 초기화
-    // setSearchParams(searchParams);
     setFilter(newFilter);
   };
 
@@ -85,7 +68,7 @@ const MyPageContainer = () => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      params: { filter }, // 모든 요청에 공통으로 filter 적용
+      params: page === "recent-view" ? "" : { filter }, // 모든 요청에 공통으로 filter 적용
     };
 
     try {
@@ -96,11 +79,8 @@ const MyPageContainer = () => {
       } else if (page === "liked-product") {
         res = await axios.get(`/api/users/${uid}/likes`, config);
       } else {
-        // 이 부분이 views API 호출 (수정된 부분)
         res = await axios.get(`/api/users/${uid}/views`, config);
       }
-
-      console.log(res.data);
       setProducts(res.data.items);
     } catch (error: any) {
       alert(
@@ -128,12 +108,10 @@ const MyPageContainer = () => {
             },
           }
         )
-        .then((res) => {
-          console.log("변경 성공:", res.data);
+        .then(() => {
           alert("닉네임 변경 성공!");
         })
-        .catch((err) => {
-          console.error("닉네임 변경 실패:", err);
+        .catch(() => {
           alert("변경 실패");
         });
       setEditMode(false);
