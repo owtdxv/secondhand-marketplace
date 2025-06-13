@@ -20,7 +20,9 @@ interface PropsType {
   toggleStatusMenu: () => void;
   onChangeStatus: (newStatus: "판매중" | "판매완료") => void;
   onClickDelete: () => void;
+  onClickEditMode: () => void;
   onClickChat: () => void;
+
 }
 const ProductDetailPage = ({
   product,
@@ -32,6 +34,7 @@ const ProductDetailPage = ({
   toggleStatusMenu,
   onChangeStatus,
   onClickDelete,
+  onClickEditMode,
   onClickChat,
 }: PropsType) => {
   return (
@@ -192,7 +195,12 @@ const ProductDetailPage = ({
               />
               {product.isMine ? (
                 <div className={styles.buttonDiv}>
-                  <div className={styles.updateButton}>수정하기</div>
+                  <div
+                    className={styles.updateButton}
+                    onClick={onClickEditMode}
+                  >
+                    수정하기
+                  </div>
                   <div className={styles.deleteButton} onClick={onClickDelete}>
                     삭제하기
                   </div>

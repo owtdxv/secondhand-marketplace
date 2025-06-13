@@ -1,12 +1,12 @@
-import { useMemo, useRef, useState } from "react";
-import AddProduct from "./AddProduct";
+import { useEffect, useMemo, useRef, useState } from "react";
+import AddProduct from "../addProduct/AddProduct";
 import { createProduct } from "../../types/product";
 import axios from "axios";
 import { app } from "../../firebase/firebase";
 import { getDownloadURL, uploadBytes, ref, getStorage } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const AddProductContainer = () => {
+const UpdateProductContainer = () => {
   const [modal, setModal] = useState<boolean>(false);
   const [data, setData] = useState<createProduct>({
     images: [],
@@ -17,10 +17,34 @@ const AddProductContainer = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const storage = getStorage(app);
   const navigate = useNavigate();
+  const { productId } = useParams();
+
+  useEffect(() => {
+    axios
+      .get(`/api/product/${productId}`)
+      .then((res) => {
+        console.log(res.data);
+        setData(normalize(res.data));
+        setRegion(res.data.saleRegion);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  const normalize = (raw: any): createProduct => ({
+    name: raw.name,
+    category: raw.category,
+    saleRegion: raw.saleRegion,
+    price: raw.price,
+    description: raw.description,
+    images: raw.images || [],
+  });
 
   const handleCameraClick = () => {
     fileInputRef.current?.click();
   };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -46,8 +70,15 @@ const AddProductContainer = () => {
     });
   };
 
-  const removeImage = (targetFile: File | string) => {
-    setImagesFiles((prev) => prev.filter((file) => file !== targetFile));
+  const removeImage = (target: File | string) => {
+    if (typeof target === "string") {
+      setData((prev) => ({
+        ...prev,
+        images: (prev.images || []).filter((img) => img !== target),
+      }));
+    } else {
+      setImagesFiles((prev) => prev.filter((file) => file !== target));
+    }
   };
 
   //여러개 파일 firebase에 업로드 해주는 코드
@@ -70,16 +101,15 @@ const AddProductContainer = () => {
     }
   };
 
-  const createProduct = async () => {
+  const updateProduct = async () => {
     try {
       //firebase에 파일 업로드
       const urls = await uploadFileAndGetUrls(imagesFiles);
-      const BASE_URL = import.meta.env.VITE_SOCKET_SERVER_URI;
       console.log("업로드 된 URL:", urls);
 
-      const postData = {
+      const postData: createProduct = {
         ...data,
-        images: urls,
+        images: [...(data.images || []), ...urls],
         saleRegion: region,
         price: Number(data.price),
       };
@@ -87,41 +117,22 @@ const AddProductContainer = () => {
       console.log(postData);
 
       await axios
-        .post("/api/product/new", postData, {
+        .put(`/api/product/edit/${productId}`, postData, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
-        .then(async (res) => {
-          console.log("상품 등록 응답:", res.data);
-
-          const productId = res.data._id;
-
-          // 상품 벡터화 API 호출
-          await axios
-            .post(
-              `${BASE_URL}/api/vectorize`,
-              { _id: productId },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            )
-            .then((vectorRes) => {
-              console.log("벡터화 성공:", vectorRes.data);
-              navigate("/"); // 모든 작업 완료 후 이동
-            })
-            .catch((err) => {
-              console.error("벡터화 실패:", err);
-              // navigate는 필요 시 여기서도 호출 가능
-            });
+        .then((res) => {
+          console.log(res);
+          alert("상품 수정이 완료되었습니다.");
+          navigate(`/products/${productId}`);
         })
         .catch((err) => {
           console.log(err);
+          alert("상품 수정에 실패했습니다.");
         });
     } catch (err) {
-      console.error("상품 등록 실패:", err);
+      console.error("상품 수정 실패:", err);
     }
   };
 
@@ -136,19 +147,22 @@ const AddProductContainer = () => {
     }));
   }, [imagesFiles]);
 
+  if (!data) {
+    return <div>상품을 가져오는 중....</div>;
+  }
   return (
     <AddProduct
       modal={modal}
       region={region}
       data={data}
-      mode="new"
+      mode="edit"
       fileInputRef={fileInputRef}
       imagesFiles={imagesFiles}
       imagePreview={imagePreview}
       setRegion={setRegion}
       modalHandler={modalHandler}
       onChangeValue={onChangeValue}
-      onClickSubmit={createProduct}
+      onClickSubmit={updateProduct}
       removeImage={removeImage}
       handleCameraClick={handleCameraClick}
       handleImageChange={handleImageChange}
@@ -156,4 +170,4 @@ const AddProductContainer = () => {
   );
 };
 
-export default AddProductContainer;
+export default UpdateProductContainer;

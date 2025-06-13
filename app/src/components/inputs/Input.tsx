@@ -5,10 +5,18 @@ interface PropsType {
   placeholder: string;
   width: string;
   name: string;
+  value?: any;
   onChange: (e: any) => void;
 }
 
-const Input = ({ type, placeholder, width, name, onChange }: PropsType) => {
+const Input = ({
+  type,
+  placeholder,
+  width,
+  name,
+  value,
+  onChange,
+}: PropsType) => {
   return (
     <input
       name={name}
@@ -17,6 +25,7 @@ const Input = ({ type, placeholder, width, name, onChange }: PropsType) => {
       type={type}
       placeholder={placeholder}
       onChange={onChange}
+      value={value}
     />
   );
 };
