@@ -603,7 +603,7 @@ export class ProductsService {
       saleRegion,
       description,
       status: '판매중',
-      sellerId: uid,
+      sellerId: new Types.ObjectId(uid),
     });
 
     await product.save();
