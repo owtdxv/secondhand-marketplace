@@ -10,12 +10,18 @@ export default defineConfig({
   },
   // Proxy 설정
   server: {
+    allowedHosts: ["master-valid-glider.ngrok-free.app"],
     port: 5173,
     proxy: {
       "/api": {
         target: "http://localhost:8080",
         changeOrigin: true,
         secure: false,
+      },
+      "/ws": {
+        target: "http://localhost:8000",
+        ws: true, // <-- WebSocket 사용 명시
+        changeOrigin: true,
       },
     },
   },
