@@ -4,6 +4,8 @@ import Product from "../../components/product/Product";
 import styles from "@/styles/pages/main.module.css";
 import middleAd from "@/assets/banner_wide.png";
 import banner1 from "@/assets/banner1.png";
+import ad1 from "@/assets/ad_1.png";
+import ad2 from "@/assets/ad_2.png";
 
 import arrowRightGray from "@/assets/icon/arrowRightGray.png";
 import {
@@ -12,6 +14,7 @@ import {
   ProductInfo,
 } from "../../types/product";
 import { User } from "../../types/user";
+import { Link } from "react-router-dom";
 4;
 interface PropsType {
   recentData: getProductResponse;
@@ -39,8 +42,14 @@ const Main = ({
       <div className={styles.mainWrap}>
         <div className={styles.topAd}>
           <div className={styles.wrapAd}>
-            <div className={styles.ad}></div>
-            <div className={styles.ad}></div>
+            <div
+              className={styles.ad}
+              style={{ backgroundImage: `url(${ad1})` }}
+            ></div>
+            <div
+              className={styles.ad}
+              style={{ backgroundImage: `url(${ad2})` }}
+            ></div>
             <div
               className={styles.ad}
               style={{ backgroundImage: `url(${banner1})` }}
@@ -59,10 +68,10 @@ const Main = ({
         <div className={styles.productsWrap}>
           <div className={styles.top}>
             <div className={styles.title}>최근 올라온 상품</div>
-            <div className={styles.all}>
+            <Link to="/products" className={styles.all}>
               <div className={styles.text}>더보기</div>
               <img width={17} height={17} src={arrowRightGray} />
-            </div>
+            </Link>
           </div>
           <div className={styles.wrapProducts}>
             {recentData?.items.map((item: ProductInfo) => (
@@ -83,10 +92,6 @@ const Main = ({
                 사용자들이 많이 좋아요를 누른 상품을 보여드립니다.
               </div>
             </div>
-            <div className={styles.all}>
-              <div className={styles.text}>더보기</div>
-              <img width={17} height={17} src={arrowRightGray} />
-            </div>
           </div>
           <div className={styles.wrapProducts}>
             {topLikeData?.items.map((item: ProductInfo) => (
@@ -106,10 +111,6 @@ const Main = ({
               <div className={styles.subTitle}>
                 사용자들이 많이 조회한 상품을 보여드립니다.
               </div>
-            </div>
-            <div className={styles.all}>
-              <div className={styles.text}>더보기</div>
-              <img width={17} height={17} src={arrowRightGray} />
             </div>
           </div>
           <div className={styles.wrapProducts}>
