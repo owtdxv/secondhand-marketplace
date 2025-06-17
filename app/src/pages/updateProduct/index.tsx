@@ -141,9 +141,12 @@ const UpdateProductContainer = () => {
         .catch((err) => {
           console.log(err);
           alert("상품 수정에 실패했습니다.");
+          setLoading(false);
         });
     } catch (err) {
       console.error("상품 수정 실패:", err);
+      alert("상품 수정에 실패했습니다.");
+      setLoading(false);
     }
   };
 
