@@ -7,8 +7,9 @@ import { useState } from "react";
 
 interface PropsType {
   setRegion: (region: string) => void;
+  modalHandler: () => void;
 }
-const LocationModal = ({ setRegion }: PropsType) => {
+const LocationModal = ({ setRegion, modalHandler }: PropsType) => {
   const [location, setLocation] = useState<number>(0);
 
   return (
@@ -39,6 +40,7 @@ const LocationModal = ({ setRegion }: PropsType) => {
               onClick={() => {
                 setRegion(item);
                 console.log(item);
+                modalHandler();
               }}
               className={styles.RegionDetail}
             >

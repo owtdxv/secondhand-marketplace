@@ -136,19 +136,20 @@ const AddProduct = ({
           </div>
 
           <div className={styles.locationSelectWrap}>
-            <select
-              name="saleRegion"
+            <div
               onClick={modalHandler}
-              required
               className={`${styles.select} ${
                 region === "지역 선택" ? styles.placeholder : ""
               }`}
             >
-              <option value={region} disabled hidden>
-                {region}
-              </option>
-            </select>
-            {modal ? <LocationModal setRegion={setRegion} /> : null}
+              {region ? region : "지역 선택"}
+            </div>
+            {modal ? (
+              <LocationModal
+                modalHandler={modalHandler}
+                setRegion={setRegion}
+              />
+            ) : null}
           </div>
         </div>
 
