@@ -81,6 +81,7 @@ const MyPageContainer = () => {
       } else {
         res = await axios.get(`/api/users/${uid}/views`, config);
       }
+      console.log(res.data);
       setProducts(res.data.items);
     } catch (error: any) {
       alert(
@@ -100,7 +101,7 @@ const MyPageContainer = () => {
       e.preventDefault();
       axios
         .put(
-          "/api/auth/edit/displayname",
+          "/api/users/edit/displayname",
           { displayName: nickName },
           {
             headers: {
