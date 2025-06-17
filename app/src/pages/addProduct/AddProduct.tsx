@@ -11,8 +11,8 @@ interface PropsType {
   region: string;
   data: createProduct;
   mode: string;
+  loading: boolean;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
-  imagesFiles: File[];
   imagePreview: { file: File; url: string }[];
   setRegion: (region: string) => void;
   modalHandler: () => void;
@@ -28,8 +28,8 @@ const AddProduct = ({
   region,
   data,
   mode,
+  loading,
   fileInputRef,
-  imagesFiles,
   imagePreview,
   setRegion,
   modalHandler,
@@ -172,8 +172,18 @@ const AddProduct = ({
           value={data.description}
         ></textarea>
 
-        <button onClick={onClickSubmit} className={styles.submitBtn}>
-          {mode == "edit" ? "수정하기" : "등록하기"}
+        <button
+          onClick={onClickSubmit}
+          disabled={loading}
+          className={styles.submitBtn}
+        >
+          {loading
+            ? mode === "edit"
+              ? "수정 중..."
+              : "등록 중..."
+            : mode === "edit"
+            ? "수정하기"
+            : "등록하기"}
         </button>
       </div>
     </div>

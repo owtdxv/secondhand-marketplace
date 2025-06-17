@@ -13,6 +13,7 @@ const UpdateProductContainer = () => {
   });
   const [imagesFiles, setImagesFiles] = useState<File[]>([]);
   const [region, setRegion] = useState<string>("지역 선택");
+  const [loading, setLoading] = useState<boolean>(false);
   const token = sessionStorage.getItem("token");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const storage = getStorage(app);
@@ -102,6 +103,7 @@ const UpdateProductContainer = () => {
   };
 
   const updateProduct = async () => {
+    setLoading(true);
     try {
       const BASE_URL = import.meta.env.VITE_SOCKET_SERVER_URI;
       //firebase에 파일 업로드
@@ -165,8 +167,8 @@ const UpdateProductContainer = () => {
       region={region}
       data={data}
       mode="edit"
+      loading={loading}
       fileInputRef={fileInputRef}
-      imagesFiles={imagesFiles}
       imagePreview={imagePreview}
       setRegion={setRegion}
       modalHandler={modalHandler}

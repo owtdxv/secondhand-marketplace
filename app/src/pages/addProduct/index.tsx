@@ -13,6 +13,7 @@ const AddProductContainer = () => {
   });
   const [imagesFiles, setImagesFiles] = useState<File[]>([]);
   const [region, setRegion] = useState<string>("지역 선택");
+  const [loading, setLoading] = useState<boolean>(false);
   const token = sessionStorage.getItem("token");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const storage = getStorage(app);
@@ -71,6 +72,7 @@ const AddProductContainer = () => {
   };
 
   const createProduct = async () => {
+    setLoading(true);
     try {
       //firebase에 파일 업로드
       const urls = await uploadFileAndGetUrls(imagesFiles);
@@ -143,8 +145,8 @@ const AddProductContainer = () => {
       data={data}
       mode="new"
       fileInputRef={fileInputRef}
-      imagesFiles={imagesFiles}
       imagePreview={imagePreview}
+      loading={loading}
       setRegion={setRegion}
       modalHandler={modalHandler}
       onChangeValue={onChangeValue}
