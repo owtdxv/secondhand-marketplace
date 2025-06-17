@@ -10,6 +10,7 @@ const AddProductContainer = () => {
   const [modal, setModal] = useState<boolean>(false);
   const [data, setData] = useState<createProduct>({
     images: [],
+    category: "디지털/가전",
   });
   const [imagesFiles, setImagesFiles] = useState<File[]>([]);
   const [region, setRegion] = useState<string>("지역 선택");
@@ -124,6 +125,8 @@ const AddProductContainer = () => {
         });
     } catch (err) {
       console.error("상품 등록 실패:", err);
+      alert("상품 등록에 실패했습니다.");
+      setLoading(false);
     }
   };
 

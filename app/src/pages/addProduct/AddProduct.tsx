@@ -122,9 +122,6 @@ const AddProduct = ({
               required
               className={styles.select}
             >
-              <option value="" disabled hidden>
-                카테고리
-              </option>
               <option>디지털/가전</option>
               <option>가구/인테리어</option>
               <option>의류/패션</option>
