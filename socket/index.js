@@ -18,6 +18,7 @@ const app = express();
 const server = http.createServer(app);
 const NGROK_URL = process.env.NGROK_URL;
 const io = new Server(server, {
+  path: "/ws",
   cors: {
     origin: ["http://localhost:5173", "http://127.0.0.1:5500", NGROK_URL], // 반드시 지정해야 함
     methods: ["GET", "POST"],
@@ -92,7 +93,7 @@ async function populateVectorStore() {
     const products = await Product.find({}).lean();
 
     const docs = products.map((product) => ({
-      pageContent: `상품명: ${product.name}, 카테고리: ${product.category}, 가격: ${product.price}원, 설명: ${product.description}`,
+      pageContent: `${product.name}는 ${product.category} 카테고리에 속한 제품으로, 가격은 ${product.price}원입니다. 제품 설명: ${product.description}`,
       metadata: {
         _id: product._id.toString(),
         name: product.name,
@@ -301,7 +302,7 @@ ${productContext}
       console.log("응답 정보: ", responseText);
       const idRegex = /_id:\s*([a-f0-9]{24})/;
       const match = responseText.match(idRegex);
-      const relevantProductId = match ? match[1] : "찾을 수 없음";
+      const relevantProductId = match ? match[1] : "";
 
       console.log(
         "Gemini 응답에서 추출된 최고 좋아요 상품 ID:",
@@ -408,9 +409,7 @@ app.post("/api/vectorize", async (req, res) => {
     }
 
     // 임베딩에 사용할 텍스트 구성
-    const content = `상품명: ${product.name}, 카테고리: ${
-      product.category
-    }, 가격: ${product.price}원, 설명: ${product.description ?? "정보 없음"}`;
+    const content = `${product.name}는 ${product.category} 카테고리에 속한 제품으로, 가격은 ${product.price}원입니다. 제품 설명: ${product.description}`;
 
     // 임베딩 생성
     const embedding = await embeddings.embedQuery(content);

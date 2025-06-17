@@ -103,7 +103,9 @@ export const GlobalSocketManager = () => {
   useEffect(() => {
     const socket_server_uri = import.meta.env.VITE_SOCKET_SERVER_URI;
     if (isLogin && user && !socketRef.current) {
-      socketRef.current = io(socket_server_uri);
+      socketRef.current = io(window.location.origin, {
+        path: "/ws",
+      });
 
       socketRef.current.on("connect", () => {
         console.log("전역 소켓 연결됨: ", user._id);

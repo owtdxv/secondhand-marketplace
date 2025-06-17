@@ -7,7 +7,9 @@ const useGeminiSocket = (token: string | null) => {
 
   useEffect(() => {
     const socket_server_uri = import.meta.env.VITE_SOCKET_SERVER_URI;
-    socketRef.current = io(socket_server_uri);
+    socketRef.current = io(window.location.origin, {
+      path: "/ws",
+    });
 
     socketRef.current.on("connect", () => setConnected(true));
     socketRef.current.on("disconnect", () => setConnected(false));

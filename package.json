@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "install-all": "concurrently \"npm --prefix api install\" \"npm --prefix app install\" \"npm --prefix socket install\"",
     "dev": "concurrently \"npm --prefix api run start:dev\" \"npm --prefix app run dev\" \"npm --prefix socket run dev\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
