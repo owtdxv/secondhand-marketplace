@@ -4,6 +4,7 @@ import LocationModal from "../../components/modal/LocationModal";
 
 import cameraIcon from "@/assets/icon/camera.png";
 import XButton from "@/assets/icon/X.png";
+import arrow from "@/assets/icon/ArrowDown.png";
 import { createProduct } from "../../types/product";
 
 interface PropsType {
@@ -143,6 +144,12 @@ const AddProduct = ({
               }`}
             >
               {region ? region : "지역 선택"}
+              <img
+                style={{ color: "black" }}
+                src={arrow}
+                width={18}
+                height={18}
+              />
             </div>
             {modal ? (
               <LocationModal
