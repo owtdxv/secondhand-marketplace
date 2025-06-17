@@ -128,6 +128,7 @@ const BottomHeader = () => {
         />
         <div className={styles.search}>
           <input
+            autoComplete="false"
             id="search-input"
             className={styles.searchInput}
             type="text"
