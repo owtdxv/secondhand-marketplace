@@ -3,6 +3,7 @@ import PageNation from "../../components/pageNation/PageNation";
 import Product from "../../components/product/Product";
 import styles from "@/styles/pages/main.module.css";
 import middleAd from "@/assets/banner_wide.png";
+import banner1 from "@/assets/banner1.png";
 
 import arrowRightGray from "@/assets/icon/arrowRightGray.png";
 import {
@@ -40,7 +41,10 @@ const Main = ({
           <div className={styles.wrapAd}>
             <div className={styles.ad}></div>
             <div className={styles.ad}></div>
-            <div className={styles.ad}></div>
+            <div
+              className={styles.ad}
+              style={{ backgroundImage: `url(${banner1})` }}
+            ></div>
           </div>
           {/* <PageNation
             totalPages={totalPage}
