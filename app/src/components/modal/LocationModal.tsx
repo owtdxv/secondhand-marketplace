@@ -3,7 +3,7 @@ import {
   Region,
   RegionGu,
 } from "../../dummy-data/korea-administrative-district";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 
 interface PropsType {
@@ -16,14 +16,18 @@ const LocationModal = ({ setRegion, modalHandler }: PropsType) => {
 
   const onClickGetLocation = () => {
     getLocation();
-
-    if (loc) {
-      setRegion(loc.region2);
-    } else {
-      console.log(error);
-    }
   };
 
+  useEffect(() => {
+    if (loc) {
+      setRegion(loc.region2);
+      const index = RegionGu.findIndex((gu) => gu === loc.region1);
+      if (index !== -1) {
+        setLocation(index);
+      }
+      modalHandler();
+    }
+  }, [loc]);
   return (
     <div className={styles.wrap}>
       <button

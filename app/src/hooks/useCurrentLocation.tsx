@@ -17,7 +17,7 @@ export const useCurrentLocation = () => {
       `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${lng}&y=${lat}`,
       {
         headers: {
-          Authorization: `KakaoAK 95a80b59f6e816205ed40dd6f1a4df9b`,
+          Authorization: `KakaoAK ${import.meta.env.VITE_KAKAO_REST_API_KEY}`,
         },
       }
     );
