@@ -10,9 +10,11 @@ const AddProductContainer = () => {
   const [modal, setModal] = useState<boolean>(false);
   const [data, setData] = useState<createProduct>({
     images: [],
+    category: "디지털/가전",
   });
   const [imagesFiles, setImagesFiles] = useState<File[]>([]);
   const [region, setRegion] = useState<string>("지역 선택");
+  const [loading, setLoading] = useState<boolean>(false);
   const token = sessionStorage.getItem("token");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const storage = getStorage(app);
@@ -71,6 +73,7 @@ const AddProductContainer = () => {
   };
 
   const createProduct = async () => {
+    setLoading(true);
     try {
       //firebase에 파일 업로드
       const urls = await uploadFileAndGetUrls(imagesFiles);
@@ -122,6 +125,8 @@ const AddProductContainer = () => {
         });
     } catch (err) {
       console.error("상품 등록 실패:", err);
+      alert("상품 등록에 실패했습니다.");
+      setLoading(false);
     }
   };
 
@@ -143,8 +148,8 @@ const AddProductContainer = () => {
       data={data}
       mode="new"
       fileInputRef={fileInputRef}
-      imagesFiles={imagesFiles}
       imagePreview={imagePreview}
+      loading={loading}
       setRegion={setRegion}
       modalHandler={modalHandler}
       onChangeValue={onChangeValue}
