@@ -56,31 +56,35 @@ const AddProduct = ({
               style={{ display: "none" }}
             />
           </div>
-          {imagesFiles &&
-            imagesFiles.map((item) => {
-              return (
-                <div
-                  style={{
-                    backgroundImage: `url(${imagePreview})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
-                  className={styles.IsPhoto}
-                >
-                  <div>
-                    <div
-                      onClick={() => removeImage(item)}
-                      className={styles.delete}
-                    >
-                      <img width={13} height={13} src={XButton} />
-                    </div>
+
+          {/* ✅ 이미지 미리보기 출력 */}
+          {imagePreview &&
+            imagePreview.map((item) => (
+              <div
+                key={item.url}
+                style={{
+                  backgroundImage: `url(${item.url})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+                className={styles.IsPhoto}
+              >
+                <div>
+                  <div
+                    onClick={() => removeImage(item.file)}
+                    className={styles.delete}
+                  >
+                    <img width={13} height={13} src={XButton} />
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
+
+          {/* 기존 이미지 출력 */}
           {data.images &&
             data.images.map((item) => (
               <div
+                key={item}
                 style={{
                   backgroundImage: `url(${item})`,
                   backgroundSize: "cover",
@@ -99,6 +103,7 @@ const AddProduct = ({
               </div>
             ))}
         </div>
+
         <Input
           name="name"
           value={data.name}
@@ -107,6 +112,7 @@ const AddProduct = ({
           placeholder="상품명을 입력해주세요."
           width="850px"
         />
+
         <div className={styles.secondLine}>
           <div className={styles.wrapSelect}>
             <select
@@ -116,7 +122,7 @@ const AddProduct = ({
               required
               className={styles.select}
             >
-              <option value="" disabled hidden selected>
+              <option value="" disabled hidden>
                 카테고리
               </option>
               <option>디지털/가전</option>
@@ -131,6 +137,7 @@ const AddProduct = ({
               <option>기타</option>
             </select>
           </div>
+
           <div className={styles.locationSelectWrap}>
             <select
               name="saleRegion"
@@ -140,7 +147,7 @@ const AddProduct = ({
                 region === "지역 선택" ? styles.placeholder : ""
               }`}
             >
-              <option value={region} disabled hidden selected>
+              <option value={region} disabled hidden>
                 {region}
               </option>
             </select>
@@ -156,6 +163,7 @@ const AddProduct = ({
           width="850px"
           value={data.price}
         />
+
         <textarea
           name="description"
           onChange={onChangeValue}
@@ -163,6 +171,7 @@ const AddProduct = ({
           placeholder="상품에 대한 설명을 입력해주세요."
           value={data.description}
         ></textarea>
+
         <button onClick={onClickSubmit} className={styles.submitBtn}>
           {mode == "edit" ? "수정하기" : "등록하기"}
         </button>
