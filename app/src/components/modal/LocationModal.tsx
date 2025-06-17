@@ -3,18 +3,40 @@ import {
   Region,
   RegionGu,
 } from "../../dummy-data/korea-administrative-district";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useCurrentLocation } from "../../hooks/useCurrentLocation";
 
 interface PropsType {
   setRegion: (region: string) => void;
   modalHandler: () => void;
 }
 const LocationModal = ({ setRegion, modalHandler }: PropsType) => {
+  const { loc, error, loading, getLocation } = useCurrentLocation();
   const [location, setLocation] = useState<number>(0);
 
+  const onClickGetLocation = () => {
+    getLocation();
+  };
+
+  useEffect(() => {
+    if (loc) {
+      setRegion(loc.region2);
+      const index = RegionGu.findIndex((gu) => gu === loc.region1);
+      if (index !== -1) {
+        setLocation(index);
+      }
+      modalHandler();
+    }
+  }, [loc]);
   return (
     <div className={styles.wrap}>
-      <button className={styles.getLocation}>현재 위치 가져오기</button>
+      <button
+        onClick={onClickGetLocation}
+        disabled={loading}
+        className={styles.getLocation}
+      >
+        {loading ? "위치 가져오는 중..." : "현재 위치 가져오기"}
+      </button>
       <div className={styles.wrapLocation}>
         <div className={styles.RegionGu}>
           {RegionGu.map((item: string, index: number) => (
