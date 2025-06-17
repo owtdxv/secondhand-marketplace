@@ -2,6 +2,8 @@ import Footer from "../../components/Footer";
 import PageNation from "../../components/pageNation/PageNation";
 import Product from "../../components/product/Product";
 import styles from "@/styles/pages/main.module.css";
+import middleAd from "@/assets/banner_wide.png";
+import banner1 from "@/assets/banner1.png";
 import ad1 from "@/assets/ad_1.png";
 import ad2 from "@/assets/ad_2.png";
 
@@ -48,7 +50,10 @@ const Main = ({
               className={styles.ad}
               style={{ backgroundImage: `url(${ad2})` }}
             ></div>
-            <div className={styles.ad}></div>
+            <div
+              className={styles.ad}
+              style={{ backgroundImage: `url(${banner1})` }}
+            ></div>
           </div>
           {/* <PageNation
             totalPages={totalPage}
@@ -56,7 +61,10 @@ const Main = ({
             onPageChange={onPageChange}
           /> */}
         </div>
-        <div className={styles.middleAd}></div>
+        <div
+          className={styles.middleAd}
+          style={{ backgroundImage: `url(${middleAd})` }}
+        ></div>
         <div className={styles.productsWrap}>
           <div className={styles.top}>
             <div className={styles.title}>최근 올라온 상품</div>
