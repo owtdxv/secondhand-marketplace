@@ -2,6 +2,7 @@ import Footer from "../../components/Footer";
 import PageNation from "../../components/pageNation/PageNation";
 import Product from "../../components/product/Product";
 import styles from "@/styles/pages/main.module.css";
+import middleAd from "@/assets/banner_wide.png";
 
 import arrowRightGray from "@/assets/icon/arrowRightGray.png";
 import {
@@ -47,7 +48,10 @@ const Main = ({
             onPageChange={onPageChange}
           /> */}
         </div>
-        <div className={styles.middleAd}></div>
+        <div
+          className={styles.middleAd}
+          style={{ backgroundImage: `url(${middleAd})` }}
+        ></div>
         <div className={styles.productsWrap}>
           <div className={styles.top}>
             <div className={styles.title}>최근 올라온 상품</div>

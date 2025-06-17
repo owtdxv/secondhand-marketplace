@@ -32,6 +32,8 @@
   height: 136px;
   background-color: #d9d9d9;
   margin-top: 24px;
+  background-size: cover;
+  background-position: center;
 }
 
 .productsWrap {
