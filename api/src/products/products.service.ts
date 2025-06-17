@@ -761,14 +761,13 @@ export class ProductsService {
     };
     const sortOption = sortMap[filter] || sortMap['latest'];
 
-    const query = { status: '판매중' };
     const skip = (page - 1) * limit;
 
     const [rawItems, total] = await Promise.all([
       this.productModel
         .find({
           name: { $regex: input, $options: 'i' },
-          query,
+          status: '판매중',
         })
         .sort(sortOption)
         .skip(skip)
@@ -777,6 +776,7 @@ export class ProductsService {
         .exec(),
       this.productModel.countDocuments({
         name: { $regex: input, $options: 'i' },
+        status: '판매중',
       }),
     ]);
 
