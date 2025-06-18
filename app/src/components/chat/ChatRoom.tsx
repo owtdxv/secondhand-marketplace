@@ -23,7 +23,7 @@ const ChatRoom = ({ user, data }: PropsType) => {
         <div className={styles.userRow}>
           <div className={styles.userName}>{data.otherUser.displayName}</div>
           <div className={styles.timestamp}>
-            {new Date(data.createdAt).toLocaleTimeString("ko-KR", {
+            {new Date(data.updatedAt).toLocaleTimeString("ko-KR", {
               hour: "2-digit",
               minute: "2-digit",
               hour12: true,
