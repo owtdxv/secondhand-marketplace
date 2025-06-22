@@ -93,7 +93,12 @@ async function populateVectorStore() {
     const products = await Product.find({}).lean();
 
     const docs = products.map((product) => ({
-      pageContent: `${product.name}는 ${product.category} 카테고리에 속한 제품으로, 가격은 ${product.price}원입니다. 제품 설명: ${product.description}`,
+      pageContent: `
+      [상품명] ${product.name}
+      [카테고리] ${product.category}
+      [가격] ${product.price}원
+      [상품 요약] ${product.description.substring(0, 100)}...
+      [상세 설명] ${product.description}`,
       metadata: {
         _id: product._id.toString(),
         name: product.name,
@@ -195,7 +200,11 @@ async function retrieveProductInfo(query) {
       }
 
       let description = "정보 없음";
-      const descriptionMatch = doc.pageContent.match(/설명: (.*)/);
+      // ✨ 수정된 정규식: '[상세 설명]' 뒤의 텍스트를 가져옵니다.
+      // (.*?)는 다음 태그([)가 나오기 전까지의 모든 문자를 탐욕적이지 않게(non-greedy) 찾습니다.
+      const descriptionMatch = doc.pageContent.match(
+        /\[상세 설명\](.*?)(?:\[|$)/
+      );
       if (descriptionMatch && descriptionMatch[1]) {
         description = descriptionMatch[1].trim();
       } else {
@@ -285,7 +294,7 @@ io.on("connection", (socket) => {
         )
         .join("\n\n");
 
-      const prompt = `사용자가 상품 정보를 요청했습니다. 다음 상품 정보들을 참조하여 사용자의 질의와 가장 관련성이 높은 상품을 요약해서 알려주세요. 반드시 응답 마지막 줄에 "_id: [상품의 ID]" 형식으로 _id를 제공하세요. 형식을 반드시 지켜주세요.
+      const prompt = `사용자가 상품 정보를 요청했습니다. 다음 상품 정보들을 참조하여 사용자의 질의와 가장 관련성이 높은 상품을 요약해서 알려주세요. 반드시 응답 마지막 줄에 "_id: [상품의 ID]" 형식으로 _id를 제공하세요. 형식을 반드시 지켜주세요. 만일 관련성이 가장 높은 상품이 존재하지 않는다고 판단한 경우, 상품 정보에 기술된 랜덤한 상품을 반드시 하나만 선택하여 반환해 주세요
 
 --- 상품 정보 ---
 ${productContext}
@@ -409,7 +418,12 @@ app.post("/api/vectorize", async (req, res) => {
     }
 
     // 임베딩에 사용할 텍스트 구성
-    const content = `${product.name}는 ${product.category} 카테고리에 속한 제품으로, 가격은 ${product.price}원입니다. 제품 설명: ${product.description}`;
+    const content = `
+      [상품명] ${product.name}
+      [카테고리] ${product.category}
+      [가격] ${product.price}원
+      [상품 요약] ${product.description.substring(0, 100)}...
+      [상세 설명] ${product.description}`;
 
     // 임베딩 생성
     const embedding = await embeddings.embedQuery(content);
