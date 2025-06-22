@@ -1,8 +1,10 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MyPage from "./MyPage";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { UserInfo } from "../../types/user";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { app } from "../../firebase/firebase";
 
 const MyPageContainer = () => {
   const token = sessionStorage.getItem("token");
@@ -16,6 +18,9 @@ const MyPageContainer = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [uid, setUid] = useState("");
+
+  const storage = getStorage(app);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -127,6 +132,46 @@ const MyPageContainer = () => {
     return <div>Loading...</div>;
   }
 
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+    try {
+      console.log("파일변환 시작");
+      const fileName = `${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, `userImages/${fileName}`);
+      await uploadBytes(storageRef, file);
+      const downloadUrl = await getDownloadURL(storageRef);
+
+      await axios
+        .put(
+          "/api/users/edit/profile-img",
+          { url: downloadUrl },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          alert("프로필 이미지가 변경되었습니다");
+
+          setUserInfo((prev) =>
+            prev ? { ...prev, profileImage: downloadUrl } : prev
+          );
+        })
+        .catch((err) => {
+          console.log("프로필 이미지 변환 실패", err);
+        });
+    } catch (err) {
+      console.log("파일업로드 실패", err);
+    }
+  };
+
   return (
     <MyPage
       data={products}
@@ -134,12 +179,15 @@ const MyPageContainer = () => {
       userInfo={userInfo}
       editMode={editMode}
       filter={filter}
+      nickName={nickName}
+      fileInputRef={fileInputRef}
       handleEditMode={handleEditMode}
       onChangePage={onChangePage}
       onChangeFilter={onChangeFilter}
       handleKeyDown={handleKeyDown}
-      nickName={nickName}
       onChangeNickName={onChangeNickName}
+      handleCameraClick={handleCameraClick}
+      handleImageChange={handleImageChange}
     />
   );
 };

@@ -1,6 +1,7 @@
 import styles from "@/styles/pages/myPage.module.css";
 import Content from "./Content";
 import editIcon from "@/assets/icon/edit.png";
+import camera from "@/assets/icon/cameraWhite.png";
 import { ProductInfo } from "../../types/product";
 import { UserInfo } from "../../types/user";
 
@@ -11,11 +12,14 @@ interface PropsType {
   userInfo: UserInfo | undefined;
   nickName?: string;
   filter?: string;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleEditMode: () => void;
   onChangePage: (page: string) => void;
   onChangeFilter: (filter: string) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onChangeNickName: (e: any) => void;
+  handleCameraClick: () => void;
+  handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const MyPage = ({
@@ -25,11 +29,14 @@ const MyPage = ({
   nickName,
   userInfo,
   filter,
+  fileInputRef,
   handleEditMode,
   onChangePage,
   onChangeFilter,
   handleKeyDown,
   onChangeNickName,
+  handleCameraClick,
+  handleImageChange,
 }: PropsType) => {
   return (
     <div className={styles.wrap}>
@@ -50,7 +57,29 @@ const MyPage = ({
             <hr className={styles.line} />
             <div className={styles.wrapUserInfo}>
               <div className={styles.userInfoLeft}>
-                <div className={styles.profile}></div>
+                <div className={styles.profileWrapper}>
+                  <img
+                    src={
+                      userInfo?.profileImage
+                        ? userInfo?.profileImage
+                        : "@/assets/icon/person.png"
+                    }
+                    className={styles.profile}
+                  />
+                  <div
+                    onClick={handleCameraClick}
+                    className={styles.wrapCamera}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      ref={fileInputRef}
+                      onChange={handleImageChange}
+                    />
+                    <img src={camera} width={15} />
+                  </div>
+                </div>
                 <div className={styles.userInfo}>
                   {editMode ? (
                     <input
