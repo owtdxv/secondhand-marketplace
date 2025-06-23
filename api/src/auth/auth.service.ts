@@ -83,10 +83,12 @@ export class AuthService {
     // 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const encodedName = encodeURIComponent(displayName);
     const user = new this.userModel({
       email,
       password: hashedPassword,
       displayName,
+      profileImage: `https://ui-avatars.com/api/?name=${encodedName}&background=random`,
     });
 
     await user.save();
