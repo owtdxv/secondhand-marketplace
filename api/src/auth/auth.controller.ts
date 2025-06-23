@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -65,10 +65,17 @@ export class AuthController {
     @Query('code') code: string,
     @Query('state') state: string,
     @Res() res: Response,
+    @Req() req: Request,
   ) {
     console.log(`네이버 콜백 수신: code=${code}, state=${state}`);
 
-    const html = await this.authService.handleNaverCallback(code, state);
+    const origin =
+      typeof req.query.origin === 'string' ? req.query.origin : '*';
+    const html = await this.authService.handleNaverCallback(
+      code,
+      state,
+      origin,
+    );
 
     res.setHeader('Content-Type', 'text/html');
     return res.send(html);

@@ -106,9 +106,14 @@ const LoginContainer = () => {
 
   const handleNaverLogin = async () => {
     const clientId = import.meta.env.VITE_NAVER_CLIENT_ID;
+    const origin = encodeURIComponent(window.location.origin);
+
+    // redirect_uri에 origin을 쿼리로 포함
+    const baseRedirectUri = import.meta.env.VITE_NAVER_REDIRECT_URI;
     const redirectUri = encodeURIComponent(
-      import.meta.env.VITE_NAVER_REDIRECT_URI
+      `${baseRedirectUri}?origin=${origin}`
     );
+
     const state = Math.random().toString(36).substring(2, 15); // CSRF 보호용
 
     const authUrl =

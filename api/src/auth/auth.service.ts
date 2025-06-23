@@ -129,8 +129,9 @@ export class AuthService {
    * 네이버 콜백을 처리합니다
    * @param code 네이버가 제공해준 code값
    * @param state 네이버가 제공해준 state값
+   * @param origin 요청을 보낸 위치
    */
-  async handleNaverCallback(code: string, state: string) {
+  async handleNaverCallback(code: string, state: string, origin: string) {
     const tokenRes = await firstValueFrom(
       this.httpService.post('http://nid.naver.com/oauth2.0/token', null, {
         params: {
@@ -195,7 +196,7 @@ export class AuthService {
         <script>
           window.opener.postMessage(
             { accessToken: '${accessToken}' },
-            'http://localhost:5173'
+            '${origin}'
           );
           window.close();
         </script>
