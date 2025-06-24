@@ -1,7 +1,7 @@
 // hooks/useAuth.js
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 
-const useAuth = () => {
+const useAuth = (): [boolean, Dispatch<SetStateAction<boolean>>] => {
   const [isLogin, setIsLogin] = useState(!!sessionStorage.getItem("token"));
 
   useEffect(() => {

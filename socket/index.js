@@ -20,7 +20,12 @@ const NGROK_URL = process.env.NGROK_URL;
 const io = new Server(server, {
   path: "/ws",
   cors: {
-    origin: ["http://localhost:5173", "http://127.0.0.1:5500", NGROK_URL], // 반드시 지정해야 함
+    origin: [
+      "http://localhost",
+      "http://localhost:5173",
+      "http://127.0.0.1:5500",
+      NGROK_URL,
+    ], // 반드시 지정해야 함
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -31,7 +36,12 @@ const PORT = 8000;
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5500", NGROK_URL],
+    origin: [
+      "http://localhost",
+      "http://localhost:5173",
+      "http://127.0.0.1:5500",
+      NGROK_URL,
+    ],
     credentials: true,
   })
 );
